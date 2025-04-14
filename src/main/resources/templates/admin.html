@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Admin Dashboard</h2>
+
+    <h4>All Users</h4>
+    <table class="table table-bordered">
+        <thead>
+        <tr><th>Username</th><th>Email</th><th>Role</th><th>Pro</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.role}"></td>
+            <td th:text="${user.pro}"></td>
+            <td>
+                <form th:action="@{'/admin/users/delete/' + ${user.id}}" method="post" style="display:inline;">
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+                <form th:action="@{'/admin/users/upgrade/' + ${user.id}}" method="post" style="display:inline;">
+                    <button class="btn btn-sm btn-success">Upgrade to Pro</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h4 class="mt-5">All Posts</h4>
+    <table class="table table-bordered">
+        <thead>
+        <tr><th>Author</th><th>Content</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="post : ${posts}">
+            <td th:text="${post.user.username}"></td>
+            <td th:text="${post.content}"></td>
+            <td>
+                <form th:action="@{'/admin/posts/delete/' + ${post.id}}" method="post">
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
