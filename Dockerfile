@@ -1,15 +1,22 @@
-# Start from Eclipse Temurin JDK base image (Java 17)
-FROM eclipse-temurin:17-jdk
+# -------- Stage 1: Build JAR --------
+FROM maven:3.9.5-eclipse-temurin-17 AS build
 
-# Set working directory inside container
 WORKDIR /app
 
-# Copy the built JAR from local target folder to container
-COPY target/*.jar app.jar
+# Copy source code
+COPY . .
 
-# Expose port 8080 (Spring Boot default)
+# Build JAR file
+RUN ./mvnw clean package -DskipTests
+
+# -------- Stage 2: Run App --------
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+# Copy only the JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Command to run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
