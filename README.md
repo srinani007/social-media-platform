@@ -2,7 +2,9 @@
 
 A full-stack Java Spring Boot web app with authentication, role-based access control, payment integration, and real-time posting.
 
-<img alt="![img.png](img.png)" src="https://your-screenshot-url.com"/>
+
+## 📸 Screenshots
+![img.png](img.png)
 
 ---
 
