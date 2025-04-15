@@ -15,8 +15,8 @@ public class EmailService {
     public void sendContactEmail(Message message, String username) {
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo("prasanthkunchanapalli.ac@gmail.com"); // 🔁 Replace with your real email
-        email.setSubject("New Contact Message: " + message.getName());
-        email.setText("From: " + message.getEmail() + "\n\n" + message.getMessage());
+        email.setSubject("New Contact Message: " + message.getSubject());
+        email.setText("From: " + message.getName() + "\nEmail: " + message.getEmail() + "\n\n" + message.getContent());
         mailSender.send(email);
     }
 }

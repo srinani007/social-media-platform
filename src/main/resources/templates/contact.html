@@ -40,8 +40,8 @@
                         <input type="email" th:field="*{email}" class="form-control" id="email" placeholder="you@example.com" required>
                     </div>
                     <div class="mb-3">
-                        <label for="message" class="form-label">Message</label>
-                        <textarea th:field="*{message}" class="form-control" id="message" rows="4" placeholder="How can we help you?" required></textarea>
+                        <label class="form-label">Message</label>
+                        <textarea th:field="*{content}" class="form-control" rows="4" placeholder="Type your message here..." required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Send Message</button>
                 </form>

@@ -13,9 +13,30 @@ public class Message {
 
     private String name;
     private String email;
-    private String message;
+    private String content;
+    private String subject;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     // ✅ Getters and Setters
     public Long getId() {
@@ -38,13 +59,7 @@ public class Message {
         this.email = email;
     }
 
-    public String getMessage() {
-        return message;
-    }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
