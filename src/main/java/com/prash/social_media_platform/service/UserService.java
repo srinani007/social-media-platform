@@ -28,10 +28,13 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+
     public User getByUsername(String username) {
+        System.out.println("Fetching user by username: " + username);
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
+
 
     public List<User> getAllUsers() {
         return userRepository.findAll();

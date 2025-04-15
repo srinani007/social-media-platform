@@ -26,7 +26,7 @@
     <div class="card mb-4 shadow-sm p-3">
         <div class="d-flex align-items-center">
             <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.username} + '&background=0d6efd&color=fff'}"
-                 alt="Avatar" class="avatar me-3">
+                 alt="Avatar" class="avatar me-3" src=" https://ui-avatars.com/api/?name=User&background=0d6efd&color=fff">
             <div>
                 <h5 class="mb-1">Welcome back, <span th:text="${user.username}">User</span> 👋</h5>
                 <span class="badge bg-secondary me-2" th:text="${user.role}">ROLE_USER</span>
