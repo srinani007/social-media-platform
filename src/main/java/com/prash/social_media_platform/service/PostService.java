@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,12 +21,10 @@ public class PostService {
     @Autowired
     private UserRepository userRepository;
 
-    public void createPost(String content, String username) {
+    public void createPost(Post post , String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        // Assuming Post is an entity class with a constructor that takes content and user
-        Post post = new Post();
-        post.setContent(content);
+        post.setCreatedAt(LocalDateTime.now());
         post.setUser(user);
         postRepository.save(post);
     }

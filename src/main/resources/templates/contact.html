@@ -30,8 +30,8 @@
                 <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
                 <!-- Contact form -->
-                <form th:action="@{/contact}" method="post" th:object="${contactForm}">
-                    <div class="mb-3">
+                <form th:action="@{/contact}" method="post" th:object="${message}">
+                <div class="mb-3">
                         <label for="name" class="form-label">Your Name</label>
                         <input type="text" th:field="*{name}" class="form-control" id="name" placeholder="John Doe" required>
                     </div>

@@ -48,8 +48,8 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">Create New Post</div>
         <div class="card-body">
-            <form th:action="@{/user/dashboard}" method="post" th:object="${post}">
-                <div class="mb-3">
+            <form th:action="@{/user/posts}" method="post" th:object="${post}">
+            <div class="mb-3">
                     <label class="form-label">Title</label>
                     <input type="text" th:field="*{title}" class="form-control" placeholder="Post title" required>
                 </div>
@@ -69,7 +69,7 @@
             <ul class="list-group list-group-flush" th:if="${posts}">
                 <li class="list-group-item" th:each="post : ${posts}">
                     <h6 th:text="${post.title}">Post Title</h6>
-                    <p class="mb-1 small text-muted" th:text="${#dates.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</p>
+                    <p class="mb-1 small text-muted" th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</p>
                     <p th:text="${post.content}">Post content here...</p>
                 </li>
             </ul>

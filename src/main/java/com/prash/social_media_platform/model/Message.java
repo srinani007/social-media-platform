@@ -1,7 +1,6 @@
 package com.prash.social_media_platform.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,47 +11,39 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
-    private User user;
-
-    private String subject;
-
-    @Column(columnDefinition = "TEXT")
-    private String content;
+    private String name;
+    private String email;
+    private String message;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // ✅ Getters and Setters
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getName() {
+        return name;
     }
 
-    public User getUser() {
-        return user;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public String getEmail() {
+        return email;
     }
 
-    public String getSubject() {
-        return subject;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public String getMessage() {
+        return message;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public LocalDateTime getCreatedAt() {

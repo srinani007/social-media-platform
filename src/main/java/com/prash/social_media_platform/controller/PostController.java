@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
@@ -27,23 +28,26 @@ public class PostController {
 
 
     @GetMapping("/dashboard")
-    public String showDashboard(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        User user = userService.getByUsername(username);
-        List<Post> posts = postService.getPostsByUser(user);
-
+    public String showDashboard(Model model, Authentication auth) {
+        User user = userService.getByUsername(auth.getName());
         model.addAttribute("user", user);
-        model.addAttribute("posts", posts);
-
+        model.addAttribute("posts", postService.getPostsByUser(user));
+        model.addAttribute("post", new Post()); // 👈 this line is essential
         return "dashboard";
     }
 
 
+
     @PostMapping("/posts")
-    public String createPost(@RequestParam("content") String content, Authentication auth) {
-        postService.createPost(content, auth.getName());
+    public String createPost(@ModelAttribute Post post, Authentication auth, RedirectAttributes redirectAttributes) {
+        try {
+            postService.createPost(post, auth.getName());
+            redirectAttributes.addFlashAttribute("success", "Post published successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Something went wrong 😢");
+        }
         return "redirect:/user/dashboard";
     }
+
+
 }

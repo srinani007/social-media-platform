@@ -31,8 +31,7 @@ public class ContactController {
     public String sendMessage(@ModelAttribute("message") Message message, Authentication auth, Model model) {
         User user = userService.getByUsername(auth.getName());
         emailService.sendContactEmail(message, user.getUsername());
-        model.addAttribute("success", true);
-        return "contact"; // Redirect to the same page to show success message
+        model.addAttribute("success", "Message sent successfully!");
+        return "contact"; // Redirect to the same page to show a success message
     }
-
 }
