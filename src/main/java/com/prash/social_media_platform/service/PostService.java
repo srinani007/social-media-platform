@@ -6,6 +6,7 @@ import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.repository.PostRepository;
 import com.prash.social_media_platform.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,5 +38,14 @@ public class PostService {
 
     public List<Post> findAllPosts() {
         return postRepository.findAll();
+    }
+
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
+    }
+
+    public List<Post> getPostsByUser(User user) {
+        return postRepository.findByUser(user);
     }
 }

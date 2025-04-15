@@ -6,19 +6,24 @@ import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.service.PayPalService;
 import com.prash.social_media_platform.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
+@Profile("prod")
 @RequestMapping("/payment")
 public class PaymentController {
 
-    @Autowired
-    private PayPalService payPalService;
+    private final PayPalService payPalService;
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
+    public PaymentController(PayPalService payPalService, UserService userService) {
+        this.payPalService = payPalService;
+        this.userService = userService;
+    }
 
     @GetMapping("/upgrade")
     public String showPaymentPage() {
