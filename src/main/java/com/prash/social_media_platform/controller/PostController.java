@@ -29,7 +29,7 @@ public class PostController {
 
 
 
-    @GetMapping("/dashboard")
+    @GetMapping("/dashboard.html")
     public String showDashboard(Model model, Authentication auth) {
         User user = userService.getByUsername(auth.getName());
         model.addAttribute("user", user);
