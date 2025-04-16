@@ -23,12 +23,12 @@ public class UserController {
         return "profile";
     }
 
-    @PostMapping("/UpdateProfile")
+    @PostMapping("/profile")
     public String updateProfile(@ModelAttribute("user") User updatedUser, Authentication auth) {
         User existingUser = userService.getByUsername(auth.getName());
         existingUser.setUsername(updatedUser.getUsername());
         existingUser.setEmail(updatedUser.getEmail());
         userService.registerUser(existingUser); // saves after encoding if needed
-        return "redirect:/user/UpdateProfile?updated=true";
+        return "redirect:/user/profile?updated=true";
     }
 }
