@@ -11,6 +11,7 @@
             color: #333;
         }
   </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
@@ -53,6 +54,22 @@
     </div>
   </div>
 </div>
+<div class="text-center mt-3">
+  <a href="/oauth2/authorization/google" class="btn btn-outline-danger w-100 mb-2">
+    <i class="fab fa-google"></i> Register with Google
+  </a>
+  <a href="/oauth2/authorization/github" class="btn btn-outline-dark w-100">
+    <i class="fab fa-github"></i> Register with GitHub
+  </a>
+</div>
 
 </body>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<footer class="text-center text-lg-start bg-light text-muted mt-5">
+  <div class="text-center p-4">
+    © 2025 Social Media Platform.
+    All rights reserved.
+    Made with ❤️ by Prasanth Kunchanapalli
+  </div>
+</footer>
 </html>
