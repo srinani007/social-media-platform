@@ -27,6 +27,8 @@ public class PostController {
     private UserService userService;
 
 
+
+
     @GetMapping("/dashboard")
     public String showDashboard(Model model, Authentication auth) {
         User user = userService.getByUsername(auth.getName());
