@@ -1,34 +1,97 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head><title>Error</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
+<head>
+  <meta charset="UTF-8">
+  <title>Error - Social Media Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap & Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    :root {
+      --gradient-start: #1e3c72;
+      --gradient-end: #2a5298;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --gradient-start: #141e30;
+        --gradient-end: #243b55;
+      }
+    }
+
+    body {
+      background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    .error-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 500px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .error-card {
+        background: rgba(28, 88, 148, 0.95);
+      }
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body {
+        animation: none;
+      }
+
+      .error-card {
+        transition: none;
+      }
+    }
+  </style>
 </head>
-<body class="bg-light">
+
+<body>
+
+<!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            font-family: 'Arial', sans-serif;
-            color: #333;
-        }
-    </style>
-<div class="container mt-5 text-center">
-    <h2>Something went wrong 😢</h2>
-    <p>Please try again or contact support.</p>
-    <a href="/" class="btn btn-primary">Go Home</a>
+
+<!-- Main Error Content -->
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="error-card shadow text-center">
+    <h2 class="text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Oops! Something went wrong 😢</h2>
+    <p class="text-muted mb-4">We're sorry for the inconvenience. Please try again or contact support if the issue persists.</p>
+    <a href="/" class="btn btn-primary">
+      <i class="fas fa-home me-1"></i> Go Home
+    </a>
+  </div>
 </div>
 
-<footer class="text-center text-lg-start bg-light text-muted mt-5" style="position: fixed; bottom: 0; width: 100%; z-index: 10; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
-    <div class="text-center p-4">
-        © 2025 Social Media Platform.
-        All rights reserved.
-        Made with ❤️ by Prasanth Kunchanapalli
-    </div>
+<!-- Footer -->
+<footer class="bg-light text-center text-muted py-3 mt-auto shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
+  <div>
+    © 2025 Social Media Platform. All rights reserved.<br>
+    Made with ❤️ by Prasanth Kunchanapalli
+  </div>
 </footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous" defer></script>
 </body>
-
-
 </html>

@@ -1,54 +1,106 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
 <head>
     <meta charset="UTF-8">
     <title>Admin Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1e3c72">
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        body {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            font-family: 'Arial', sans-serif;
-            color: #333;
+        :root {
+            --gradient-start: #1e3c72;
+            --gradient-end: #295eb9;
+            --card-background: rgba(255, 255, 255, 0.95);
         }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --gradient-start: #2c3e50;
+                --gradient-end: #3498db;
+                --card-background: rgba(21, 77, 190, 0.98);
+            }
+        }
+
+        body {
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: #f8f9fa;
+            min-height: 100vh;
+        }
+
         .admin-title {
             font-weight: 700;
+            color: #fff;
         }
+
         .table thead {
-            background-color: #0d6efd;
+            background-color: #0f4595;
             color: white;
         }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 1rem;
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+            }
+        }
     </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
+
 <body>
+<!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
+<!-- Main Content -->
 <div class="container py-5">
-
-    <!-- Page Title -->
     <div class="mb-4 text-center">
         <h2 class="admin-title">Admin Dashboard</h2>
-        <p class="text-muted">Manage all users and their access levels</p>
+        <p class="text-light opacity-75">Manage all users and their access levels</p>
     </div>
 
     <!-- Flash Messages -->
-    <div th:if="${success}" class="alert alert-success text-center" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
     <!-- User Table -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">All Registered Users</div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-striped table-hover mb-0">
                     <thead>
                     <tr>
-                        <th scope="col">Username</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Role</th>
-                        <th scope="col">Pro User</th>
-                        <th scope="col">Actions</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Pro User</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody th:each="user : ${users}">
@@ -59,12 +111,14 @@
                             <span class="badge bg-secondary" th:text="${user.role}">ROLE_USER</span>
                         </td>
                         <td>
-                                <span th:classappend="${user.pro} ? 'badge bg-success' : 'badge bg-warning text-dark'"
-                                      th:text="${user.pro} ? 'Pro ✅' : 'Free ❌'">Free ❌</span>
+                            <span th:classappend="${user.pro} ? 'badge bg-success' : 'badge bg-warning text-dark'"
+                                  th:text="${user.pro} ? 'Pro ✅' : 'Free ❌'">Free ❌</span>
                         </td>
                         <td>
-                            <a th:href="@{'/admin/make-pro/' + ${user.id}}" class="btn btn-sm btn-outline-success me-2">Make Pro</a>
-                            <a th:href="@{'/admin/delete/' + ${user.id}}" class="btn btn-sm btn-outline-danger">Delete</a>
+                            <a th:href="@{'/admin/make-pro/' + ${user.id}}"
+                               class="btn btn-sm btn-outline-success me-2">Make Pro</a>
+                            <a th:href="@{'/admin/delete/' + ${user.id}}"
+                               class="btn btn-sm btn-outline-danger btn-delete">Delete</a>
                         </td>
                     </tr>
                     </tbody>
@@ -74,7 +128,7 @@
     </div>
 
     <!-- User Search -->
-    <div class="card mt-4 shadow-sm">
+    <div class="card shadow-sm">
         <div class="card-header bg-secondary text-white">Search Users</div>
         <div class="card-body">
             <form th:action="@{/admin/search}" method="get">
@@ -85,36 +139,30 @@
             </form>
         </div>
     </div>
-
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-
-<footer class="text-center text-lg-start bg-light text-muted mt-5" style="position: fixed; bottom: 0; width: 100%; z-index: 10; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
-    <div class="text-center p-4">
-        © 2025 Social Media Platform.
-        All rights reserved.
-        Made with ❤️ by Prasanth Kunchanapalli
+<!-- Footer -->
+<footer class="bg-light text-center text-muted py-3 mt-5 shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
+    <div>
+        © 2025 Social Media Platform. All rights reserved.
+        Made with <span class="text-danger">❤️</span> by Prasanth Kunchanapalli
     </div>
 </footer>
+
+<!-- JS Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous" defer></script>
+
 <script>
-    // Optional: Add any custom JavaScript here
-    // For example, you can add a confirmation dialog for delete actions
-    document.querySelectorAll('a.btn-outline-danger').forEach(function (button) {
+    // Confirm before delete
+    document.querySelectorAll('.btn-delete').forEach(function (button) {
         button.addEventListener('click', function (event) {
             if (!confirm('Are you sure you want to delete this user?')) {
                 event.preventDefault();
             }
         });
     });
-    // Optional: Add any custom JavaScript here
 </script>
 </body>
-
-
 </html>

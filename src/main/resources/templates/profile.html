@@ -1,75 +1,142 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
 <head>
     <meta charset="UTF-8">
     <title>User Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            font-family: 'Arial', sans-serif;
-            color: #333;
-        }
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid #0d6efd;
-            object-fit: cover;
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        :root {
+          --gradient-start: #1e3c72;
+          --gradient-end: #2a5298;
+          --card-background: rgba(255, 255, 255, 0.95);
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --gradient-start: #141e30;
+            --gradient-end: #243b55;
+            --card-background: rgba(28, 80, 132, 0.95);
+          }
+        }
+
+        body {
+          background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+          background-size: 200% 200%;
+          animation: gradientShift 15s ease infinite;
+          font-family: 'Segoe UI', system-ui, sans-serif;
+          color: #f8f9fa;
+          min-height: 100vh;
+        }
+
+        .card {
+          background-color: var(--card-background);
+          border-radius: 1rem;
+        }
+
+        .avatar {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          border: 3px solid #0d6efd;
+          object-fit: cover;
+        }
+
+        .form-label {
+          color: #dee2e6;
+        }
+
+        .form-control::placeholder {
+          color: #adb5bd;
+        }
+
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          body {
+            animation: none;
+          }
+
+          .card {
+            transition: none;
+          }
+        }
+    </style>
 </head>
+
 <body>
+
+<!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<!-- Main Content -->
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg border-0 rounded-4 p-4">
+            <div class="card shadow-lg p-4">
                 <div class="text-center mb-4">
                     <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.username} + '&background=0d6efd&color=fff'}"
-                         alt="User Avatar" class="avatar mb-2">
-                    <h4 class="mb-0" th:text="${user.username}">Username</h4>
+                         alt="User Avatar" class="avatar mb-2" src="https://ui-avatars.com/api/?name=User&background=0d6efd&color=fff">
+                    <h4 class="mb-0 text-light" th:text="${user.username}">Username</h4>
                     <p class="text-muted small mb-1" th:text="${user.email}">email@example.com</p>
-                    <span class="badge rounded-pill" th:classappend="${user.pro} ? 'bg-success' : 'bg-secondary'"
+                    <span class="badge rounded-pill"
+                          th:classappend="${user.pro} ? 'bg-success' : 'bg-secondary'"
                           th:text="${user.pro} ? 'Pro User ✅' : 'Free User'">Free User</span>
                 </div>
 
+                <!-- Email Update Form -->
                 <form th:action="@{/user/profile}" th:object="${user}" method="post">
                     <div class="mb-3">
                         <label class="form-label">Email</label>
-                        <input type="email" th:field="*{email}" class="form-control" required>
+                        <input type="email" th:field="*{email}" class="form-control" placeholder="Update your email" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Update Email</button>
                 </form>
 
+                <!-- Actions -->
                 <div class="d-flex justify-content-between mt-3">
-                    <a href="/user/dashboard" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+                    <a href="/user/dashboard" class="btn btn-outline-light btn-sm">← Dashboard</a>
                     <a href="/payment/upgrade" class="btn btn-outline-success btn-sm">Upgrade to Pro</a>
                 </div>
-             <div class="d-flex flex-column align-items-center gap-3 mt-3">
-                 <a href="/user/posts" class="btn btn-info btn-sm text-white w-75">View My Posts</a>
-                 <a href="/logout" class="btn btn-danger btn-sm w-75">Logout</a>
-                 <a href="/user/delete" class="btn btn-outline-danger btn-sm w-75">Delete Account</a>
-             </div>
+
+                <div class="d-flex flex-column align-items-center gap-3 mt-4">
+                    <a href="/user/posts" class="btn btn-info btn-sm text-white w-75">
+                        <i class="fas fa-list-alt me-1"></i> View My Posts
+                    </a>
+                    <a href="/logout" class="btn btn-danger btn-sm w-75">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </a>
+                    <a href="/user/delete" class="btn btn-outline-danger btn-sm w-75">
+                        <i class="fas fa-trash-alt me-1"></i> Delete Account
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<footer class="text-center text-lg-start bg-light text-muted mt-5" style="position: fixed; bottom: 0; width: 100%; z-index: 10; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
-    <div class="text-center p-4">
-        © 2025 Social Media Platform.
-        All rights reserved.
+<!-- Footer -->
+<footer class="bg-light text-center text-muted py-3 mt-auto shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
+    <div>
+        © 2025 Social Media Platform. All rights reserved.<br>
         Made with ❤️ by Prasanth Kunchanapalli
     </div>
 </footer>
 
-
-
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous" defer></script>
 </body>
-
-
 </html>

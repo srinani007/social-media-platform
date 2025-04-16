@@ -1,61 +1,113 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
 <head>
     <meta charset="UTF-8">
     <title>User Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1e3c72">
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
-        body {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            font-family: 'Arial', sans-serif;
-            color: #333;
+        :root {
+          --gradient-start: #1e3c72;
+          --gradient-end: #2a5298;
+          --card-background: rgba(255, 255, 255, 0.95);
         }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --gradient-start: #1e3764;
+            --gradient-end: #243b55;
+            --card-background: rgba(32, 85, 138, 0.95);
+          }
+        }
+
+        body {
+          background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+          background-size: 200% 200%;
+          animation: gradientShift 15s ease infinite;
+          font-family: 'Segoe UI', system-ui, sans-serif;
+          color: #f8f9fa;
+          min-height: 100vh;
+        }
+
+        .card {
+          background-color: var(--card-background);
+          border-radius: 1rem;
+        }
+
         .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #0d6efd;
+        }
+
+        .form-control::placeholder {
+          color: #adb5bd;
+        }
+
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          body {
+            animation: none;
+          }
         }
     </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
+
 <body>
 
+<!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
+<!-- Main Content -->
 <div class="container py-5">
 
-    <!-- User Welcome Block -->
+    <!-- User Welcome -->
     <div class="card mb-4 shadow-sm p-3">
         <div class="d-flex align-items-center">
             <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.username} + '&background=0d6efd&color=fff'}"
-                 alt="Avatar" class="avatar me-3" src=" https://ui-avatars.com/api/?name=User&background=0d6efd&color=fff">
+                 alt="User Avatar" class="avatar me-3" src="https://ui-avatars.com/api/?name=User&background=0d6efd&color=fff">
             <div>
-                <h5 class="mb-1">Welcome back, <span th:text="${user.username}">User</span> 👋</h5>
+                <h5 class="mb-1 text-light">Welcome back, <span th:text="${user.username}">User</span> 👋</h5>
                 <span class="badge bg-secondary me-2" th:text="${user.role}">ROLE_USER</span>
                 <span th:classappend="${user.pro} ? 'badge bg-success' : 'badge bg-warning text-dark'"
                       th:text="${user.pro} ? 'Pro User ✅' : 'Free User'">Free User</span>
             </div>
             <div class="ms-auto">
-                <a href="/user/profile" class="btn btn-sm btn-outline-primary me-2">Profile</a>
+                <a href="/user/profile" class="btn btn-sm btn-outline-light me-2">Profile</a>
                 <a href="/logout" class="btn btn-sm btn-outline-danger">Logout</a>
             </div>
-
         </div>
     </div>
 
-    <!-- Flash Message -->
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
+    <!-- Flash Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
     <!-- Create Post -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">Create New Post</div>
         <div class="card-body">
             <form th:action="@{/user/posts}" method="post" th:object="${post}">
-            <div class="mb-3">
+                <div class="mb-3">
                     <label class="form-label">Title</label>
                     <input type="text" th:field="*{title}" class="form-control" placeholder="Post title" required>
                 </div>
@@ -68,15 +120,15 @@
         </div>
     </div>
 
-    <!-- Post List -->
+    <!-- User Posts -->
     <div class="card shadow-sm">
         <div class="card-header bg-secondary text-white">Your Posts</div>
         <div class="card-body p-0">
             <ul class="list-group list-group-flush" th:if="${posts}">
                 <li class="list-group-item" th:each="post : ${posts}">
-                    <h6 th:text="${post.title}">Post Title</h6>
+                    <h6 th:text="${post.title}" class="mb-1 fw-semibold text-dark">Post Title</h6>
                     <p class="mb-1 small text-muted" th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</p>
-                    <p th:text="${post.content}">Post content here...</p>
+                    <p class="text-dark" th:text="${post.content}">Post content here...</p>
                 </li>
             </ul>
             <div class="p-3 text-muted text-center" th:if="${#lists.isEmpty(posts)}">
@@ -84,19 +136,19 @@
             </div>
         </div>
     </div>
-
-
 </div>
 
-<footer class="text-center text-lg-start bg-light text-muted mt-5" style="position: fixed; bottom: 0; width: 100%; z-index: 10; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
-    <div class="text-center p-4">
-        © 2025 Social Media Platform.
-        All rights reserved.
+<!-- Footer -->
+<footer class="bg-light text-center text-muted py-3 mt-5 shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
+    <div>
+        © 2025 Social Media Platform. All rights reserved.<br>
         Made with ❤️ by Prasanth Kunchanapalli
     </div>
 </footer>
 
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous" defer></script>
 </body>
-
-
 </html>

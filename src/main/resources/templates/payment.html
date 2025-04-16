@@ -1,46 +1,101 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
 <head>
     <meta charset="UTF-8">
     <title>Upgrade to Pro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
+        :root {
+          --gradient-start: #1e3c72;
+          --gradient-end: #2a5298;
+          --card-background: rgba(255, 255, 255, 0.95);
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --gradient-start: #141e30;
+            --gradient-end: #243b55;
+            --card-background: rgba(29, 93, 156, 0.95);
+          }
+        }
+
         body {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            font-family: 'Arial', sans-serif;
-            color: #333;
+          background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+          background-size: 200% 200%;
+          animation: gradientShift 15s ease infinite;
+          font-family: 'Segoe UI', system-ui, sans-serif;
+          color: #f8f9fa;
+          min-height: 100vh;
         }
+
         .pro-card {
-            border: 2px solid #0d6efd;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+          background: var(--card-background);
+          border: 2px solid #0d6efd;
+          border-radius: 1rem;
+          box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
+
         .pro-badge {
-            font-size: 0.85rem;
+          font-size: 0.85rem;
+        }
+
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          body {
+            animation: none;
+          }
+
+          .pro-card {
+            transition: none;
+          }
         }
     </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
+
 <body>
 
+<!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
-<div class="container py-5 d-flex justify-content-center">
 
+<!-- Main Content -->
+<div class="container py-5 d-flex justify-content-center">
     <div class="card pro-card w-100" style="max-width: 500px;">
         <div class="card-body text-center">
-            <h2 class="card-title mb-3">Upgrade to <span class="text-primary fw-bold">Pro</span> 🚀</h2>
+            <h2 class="card-title mb-3 text-light">
+                Upgrade to <span class="text-primary fw-bold">Pro</span> 🚀
+            </h2>
             <p class="text-muted">Unlock premium features and enhanced visibility!</p>
 
-            <!-- Flash messages -->
-            <div th:if="${success}" class="alert alert-success mt-3" th:text="${success}"></div>
-            <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" th:text="${success}" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" th:text="${error}" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
 
             <!-- Payment Form -->
             <form th:action="@{/payment/checkout}" method="post" class="mt-4">
                 <input type="hidden" name="amount" value="999">
-                <button type="submit" class="btn btn-lg btn-success w-100">Pay ₹9.99 with PayPal</button>
+                <button type="submit" class="btn btn-lg btn-success w-100">
+                    <i class="fas fa-paypal me-2"></i> Pay ₹9.99 with PayPal
+                </button>
             </form>
 
+            <!-- Pro Benefits -->
             <div class="mt-4 text-muted small">
                 <span class="pro-badge badge bg-primary">Pro Benefits</span>
                 <ul class="list-unstyled mt-2">
@@ -49,22 +104,21 @@
                     <li>✔ Highlighted profile badge</li>
                 </ul>
             </div>
-
         </div>
     </div>
-
 </div>
 
-<footer class="text-center text-lg-start bg-light text-muted mt-5" style="position: fixed; bottom: 0; width: 100%; z-index: 10; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
-    <div class="text-center p-4">
-        © 2025 Social Media Platform.
-        All rights reserved.
+<!-- Footer -->
+<footer class="bg-light text-center text-muted py-3 mt-auto shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
+    <div>
+        © 2025 Social Media Platform. All rights reserved.<br>
         Made with ❤️ by Prasanth Kunchanapalli
     </div>
 </footer>
 
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous" defer></script>
 </body>
-
-
-
 </html>
