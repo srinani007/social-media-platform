@@ -27,9 +27,7 @@ public class PostController {
     private UserService userService;
 
 
-
-
-    @GetMapping("/dashboard.html")
+    @GetMapping("/dashboard")
     public String showDashboard(Model model, Authentication auth) {
         User user = userService.getByUsername(auth.getName());
         model.addAttribute("user", user);
@@ -37,7 +35,6 @@ public class PostController {
         model.addAttribute("post", new Post()); // 👈 this line is essential
         return "dashboard";
     }
-
 
 
     @PostMapping("/posts")

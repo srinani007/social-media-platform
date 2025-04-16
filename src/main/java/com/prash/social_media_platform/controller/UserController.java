@@ -15,12 +15,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/dashboard.html")
-    public String showDashboard(Model model, Authentication auth) {
-        User user = userService.getByUsername(auth.getName());
-        model.addAttribute("user", user);
-        return "dashboard.html";
-    }
 
     @GetMapping("/profile")
     public String showProfile(Model model, Authentication auth) {
