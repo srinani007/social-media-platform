@@ -1,5 +1,6 @@
+<!-- NOTE: Add this in templates/dashboard.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto">
 <head>
     <meta charset="UTF-8">
     <title>User Dashboard</title>
@@ -7,67 +8,58 @@
     <meta name="theme-color" content="#1e3c72">
 
     <!-- Bootstrap & FontAwesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 
     <style>
         :root {
-          --gradient-start: #1e3c72;
-          --gradient-end: #2a5298;
-          --card-background: rgba(255, 255, 255, 0.95);
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
+            --card-background: rgba(255, 255, 255, 0.95);
         }
-
         @media (prefers-color-scheme: dark) {
-          :root {
-            --gradient-start: #1e3764;
-            --gradient-end: #243b55;
-            --card-background: rgba(32, 85, 138, 0.95);
-          }
+            :root {
+                --gradient-start: #141e30;
+                --gradient-end: #243b55;
+                --card-background: rgba(28, 80, 132, 0.95);
+            }
         }
 
         body {
-          background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
-          background-size: 200% 200%;
-          animation: gradientShift 15s ease infinite;
-          font-family: 'Segoe UI', system-ui, sans-serif;
-          color: #f8f9fa;
-          min-height: 100vh;
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: #f8f9fa;
+            min-height: 100vh;
         }
 
         .card {
-          background-color: var(--card-background);
-          border-radius: 1rem;
+            background-color: var(--card-background);
+            border-radius: 1rem;
         }
 
         .avatar {
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid #0d6efd;
-        }
-
-        .form-control::placeholder {
-          color: #adb5bd;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #0d6efd;
         }
 
         @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          body {
-            animation: none;
-          }
+            body {
+                animation: none;
+            }
         }
     </style>
 </head>
-
 <body>
 
 <!-- Navbar -->
@@ -75,18 +67,36 @@
 
 <!-- Main Content -->
 <div class="container py-5">
+    <h1 class="text-center mb-4">User Dashboard</h1>
 
-    <!-- User Welcome -->
+    <!-- Pro Upgrade Prompt -->
+    <div class="alert alert-info border-info bg-gradient mt-4 d-flex justify-content-between align-items-center"
+         th:if="${user != null and !user.pro}">
+        <div>
+            <h6 class="fw-semibold mb-1"><i class="fas fa-star text-warning me-2"></i>Upgrade to Pro</h6>
+            <p class="mb-0 small">Unlock unlimited posting, priority support, and profile boosts.</p>
+        </div>
+        <a href="/payment/upgrade" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-arrow-up-right-from-square me-1"></i> Upgrade Now
+        </a>
+    </div>
+
+
+    <!-- Welcome Header -->
     <div class="card mb-4 shadow-sm p-3">
         <div class="d-flex align-items-center">
-            <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.username} + '&background=0d6efd&color=fff'}"
-                 alt="User Avatar" class="avatar me-3" src="https://ui-avatars.com/api/?name=User&background=0d6efd&color=fff">
+            <img class="avatar me-3"
+                 th:src="@{'https://ui-avatars.com/api/?name=' + ${user.username} + '&background=0d6efd&color=fff'}"
+                 alt="User Avatar">
             <div>
                 <h5 class="mb-1 text-light">Welcome back, <span th:text="${user.username}">User</span> 👋</h5>
-                <span class="badge bg-secondary me-2" th:text="${user.role}">ROLE_USER</span>
+                <span class="badge me-2"
+                      th:classappend="${user.role == 'ROLE_ADMIN'} ? 'bg-danger' : 'bg-secondary'"
+                      th:text="${user.role == 'ROLE_ADMIN'} ? 'Admin' : 'User'">User</span>
                 <span th:classappend="${user.pro} ? 'badge bg-success' : 'badge bg-warning text-dark'"
                       th:text="${user.pro} ? 'Pro User ✅' : 'Free User'">Free User</span>
             </div>
+
             <div class="ms-auto">
                 <a href="/user/profile" class="btn btn-sm btn-outline-light me-2">Profile</a>
                 <a href="/logout" class="btn btn-sm btn-outline-danger">Logout</a>
@@ -102,7 +112,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <!-- Create Post -->
+    <!-- Create Post Form -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white">Create New Post</div>
         <div class="card-body">
@@ -120,7 +130,7 @@
         </div>
     </div>
 
-    <!-- User Posts -->
+    <!-- Post List -->
     <div class="card shadow-sm">
         <div class="card-header bg-secondary text-white">Your Posts</div>
         <div class="card-body p-0">
@@ -137,6 +147,41 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener("DOMContentLoaded", () => {
+      const ctx = document.getElementById("postsChart");
+      if (ctx) {
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: /*[[${chartLabels}]]*/,
+            datasets: [{
+              label: 'Posts This Week',
+              data: /*[[${chartData}]]*/,
+              fill: true,
+              borderColor: '#0d6efd',
+              backgroundColor: 'rgba(13,110,253,0.1)',
+              tension: 0.3
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+    });
+    /*]]>*/
+</script>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+</body>
+
 
 <!-- Footer -->
 <footer class="bg-light text-center text-muted py-3 mt-5 shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
@@ -144,10 +189,4 @@
         © 2025 Social Media Platform. All rights reserved.
     </div>
 </footer>
-
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous" defer></script>
-</body>
 </html>

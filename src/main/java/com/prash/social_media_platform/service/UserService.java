@@ -23,6 +23,9 @@ public class UserService {
         user.setRole("ROLE_USER"); // Spring Security needs "ROLE_" prefix
         userRepository.save(user);
     }
+    public void updateUser(User updated) {
+        userRepository.save(updated); // no password encoding or role override
+    }
 
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);

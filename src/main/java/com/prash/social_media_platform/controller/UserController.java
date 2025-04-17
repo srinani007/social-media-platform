@@ -28,7 +28,8 @@ public class UserController {
         User existingUser = userService.getByUsername(auth.getName());
         existingUser.setUsername(updatedUser.getUsername());
         existingUser.setEmail(updatedUser.getEmail());
-        userService.registerUser(existingUser); // saves after encoding if needed
+        userService.updateUser(existingUser);
         return "redirect:/user/profile?updated=true";
     }
+
 }

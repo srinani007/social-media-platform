@@ -29,7 +29,8 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    private String role = "USER";
+    private String role = "ROLE_USER";
+
 
     private boolean isPro = false;
 
