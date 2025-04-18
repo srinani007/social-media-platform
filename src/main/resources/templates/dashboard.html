@@ -136,9 +136,12 @@
         <div class="card-body p-0">
             <ul class="list-group list-group-flush" th:if="${posts}">
                 <li class="list-group-item" th:each="post : ${posts}">
-                    <h6 th:text="${post.title}" class="mb-1 fw-semibold text-dark">Post Title</h6>
-                    <p class="mb-1 small text-muted" th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</p>
-                    <p class="text-dark" th:text="${post.content}">Post content here...</p>
+                    <h6 th:text="${post.title}">Post Title</h6>
+                    <p class="mb-1 small text-muted">
+                        Posted by <strong th:text="${post.user.username}">Username</strong>
+                        on <span th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</span>
+                    </p>
+                    <p th:text="${post.content}">Post content here...</p>
                 </li>
             </ul>
             <div class="p-3 text-muted text-center" th:if="${#lists.isEmpty(posts)}">
