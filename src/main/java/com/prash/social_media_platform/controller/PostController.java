@@ -28,7 +28,7 @@ public class PostController {
     @GetMapping("/dashboard")
     public String showDashboard(Model model, Authentication auth) {
         User user = userService.getByUsername(auth.getName());
-        List<Post> posts = postService.getPostsByUser(user);
+        List<Post> posts = postService.findAllPosts();
 
         model.addAttribute("user", user);
         model.addAttribute("posts", posts);
