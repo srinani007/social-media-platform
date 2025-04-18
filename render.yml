@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: social-media-platform
+    env: java
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JDBC_DATABASE_URL
+        value: jdbc:postgresql://ep-super-truth-a4kbslw6-pooler.us-east-1.aws.neon.tech/socialmedia?sslmode=require
+      - key: JDBC_DATABASE_USERNAME
+        value: neondb_owner
+      - key: JDBC_DATABASE_PASSWORD
+        value: npg_xWFiyCMO6nj7
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: GMAIL_USERNAME
+        sync: false
+      - key: GMAIL_PASSWORD
+        sync: false
