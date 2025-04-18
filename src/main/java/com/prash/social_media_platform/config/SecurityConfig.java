@@ -29,7 +29,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        // ✅ Only enable HTTPS enforcement in production
         if (env.acceptsProfiles(Profiles.of("prod"))) {
             http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
         }
