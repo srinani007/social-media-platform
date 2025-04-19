@@ -59,6 +59,13 @@ public class UserService {
         user.setPro(true);
         userRepository.save(user);
     }
+    public void setRole(Long id, String role) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRole(role);
+        userRepository.save(user);
+    }
+
 
 
 }

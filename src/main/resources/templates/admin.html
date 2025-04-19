@@ -115,11 +115,18 @@
                                   th:text="${user.pro} ? 'Pro ✅' : 'Free ❌'">Free ❌</span>
                         </td>
                         <td>
+                            <form th:action="@{'/admin/promote/' + ${user.id}}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-info me-2"
+                                        th:if="${user.role != 'ROLE_ADMIN'}">
+                                    Make Admin
+                                </button>
+                            </form>
                             <a th:href="@{'/admin/make-pro/' + ${user.id}}"
                                class="btn btn-sm btn-outline-success me-2">Make Pro</a>
                             <a th:href="@{'/admin/delete/' + ${user.id}}"
                                class="btn btn-sm btn-outline-danger btn-delete">Delete</a>
                         </td>
+
                     </tr>
                     </tbody>
                 </table>

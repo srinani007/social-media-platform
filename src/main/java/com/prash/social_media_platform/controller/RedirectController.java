@@ -19,7 +19,7 @@ public class RedirectController {
         String role = auth.getAuthorities().toString();
 
         if (role.contains("ADMIN")) {
-            return "redirect:/admin";
+            return "redirect:/admin/dashboard";
         }
 
         // For USER: check Pro status
