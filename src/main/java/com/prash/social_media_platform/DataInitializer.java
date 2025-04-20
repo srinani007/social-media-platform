@@ -13,24 +13,23 @@ public class DataInitializer {
     @Bean
     CommandLineRunner init(UserRepository userRepository, PasswordEncoder encoder) {
         return args -> {
-            if (userRepository.findByUsername("admin").isEmpty()) {
-                User admin = new User();
-                admin.setUsername("admin");
-                admin.setEmail("admin@example.com");
-                admin.setPassword(encoder.encode("adminpassword"));
+            System.out.println("Checking for admin user...");
+            if (userRepository.findByUsername("admin").isPresent()) {
+                User admin = userRepository.findByUsername("admin").get();
+                admin.setPassword(encoder.encode("newadminpassword"));
                 admin.setRole("ROLE_ADMIN");
                 admin.setPro(true);
                 userRepository.save(admin);
-            }
-
-            if (userRepository.findByUsername("user").isEmpty()) {
-                User user = new User();
-                user.setUsername("user");
-                user.setEmail("user@example.com");
-                user.setPassword(encoder.encode("userpassword"));
-                user.setRole("ROLE_USER");
-                user.setPro(false);
-                userRepository.save(user);
+                System.out.println("✅ Updated existing admin user.");
+            } else {
+                User admin = new User();
+                admin.setUsername("admin");
+                admin.setEmail("admin@example.com");
+                admin.setPassword(encoder.encode("newadminpassword"));
+                admin.setRole("ROLE_ADMIN");
+                admin.setPro(true);
+                userRepository.save(admin);
+                System.out.println("✅ Created new admin user.");
             }
         };
     }

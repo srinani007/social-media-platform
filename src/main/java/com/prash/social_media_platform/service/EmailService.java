@@ -22,9 +22,9 @@ public class EmailService {
     }
 
     @PostConstruct
-    public void debugMailProps() {
-        System.out.println("MAIL USER: " + System.getProperty("spring.mail.username"));
-        System.out.println("MAIL PASS: " + System.getProperty("spring.mail.password"));
+    public void debugEmailConfig() {
+        System.out.println(">>> GMAIL_USERNAME = " + System.getProperty("GMAIL_USERNAME"));
+        System.out.println(">>> GMAIL_PASSWORD = " + System.getProperty("GMAIL_PASSWORD"));
     }
 
 }

@@ -6,14 +6,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("dev") // ✅ only load .env in dev profile
+@Profile("dev")
 public class EnvConfig {
-
     @PostConstruct
     public void loadEnv() {
-        Dotenv dotenv = Dotenv.configure()
-                .ignoreIfMissing() // ✅ optional safety
-                .load();
+        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         dotenv.entries().forEach(entry -> {
             System.setProperty(entry.getKey(), entry.getValue());
         });
