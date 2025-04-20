@@ -1,6 +1,8 @@
 package com.prash.social_media_platform.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +18,8 @@ public class Post {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user_post"))
+    @OnDelete(action = OnDeleteAction.CASCADE) // ✅ add this line
     private User user;
 
     private LocalDateTime createdAt = LocalDateTime.now();
