@@ -29,6 +29,7 @@ public class UserController {
         existingUser.setUsername(updatedUser.getUsername());
         existingUser.setEmail(updatedUser.getEmail());
         userService.updateUser(existingUser);
+        System.out.println("Updating user: " + existingUser.getEmail());
         return "redirect:/user/profile?updated=true";
     }
 

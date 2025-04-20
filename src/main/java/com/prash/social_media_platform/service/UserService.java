@@ -2,6 +2,7 @@ package com.prash.social_media_platform.service;
 
 import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService {
 
     @Autowired
@@ -17,6 +19,15 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmailIgnoreCase(email);
+    }
+
+    public User getByUsernameOrEmail(String identifier) {
+        return userRepository.findByUsernameOrEmailIgnoreCase(identifier, identifier)
+                .orElseThrow(() -> new RuntimeException("User not found: " + identifier));
+    }
 
     public void registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));

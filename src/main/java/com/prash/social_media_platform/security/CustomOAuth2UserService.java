@@ -2,7 +2,6 @@ package com.prash.social_media_platform.security;
 
 import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.repository.UserRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,54 +18,39 @@ import java.util.Collections;
 import java.util.Map;
 
 @Service
-
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
 
     @Autowired
     private UserRepository userRepository;
 
-    private static final Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
-
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) {
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
+        Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        try {
-            // Debug logging - add this to see all attributes
-            Map<String, Object> attributes = oAuth2User.getAttributes();
-            log.debug("OAuth2 User Attributes: {}", attributes);
+        String email = oAuth2User.getAttribute("email");
+        if (email == null) throw new OAuth2AuthenticationException("Email missing");
 
-            String email = oAuth2User.getAttribute("email");
-            String name = oAuth2User.getAttribute("name");
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setUsername(email); // or generate a username
+                    newUser.setEmail(email);
+                    newUser.setPassword("{noop}OAUTH2_USER");
+                    newUser.setRole("ROLE_USER");
+                    return userRepository.save(newUser);
+                });
 
-            if (email == null) {
-                throw new OAuth2AuthenticationException(
-                        new OAuth2Error("missing_email", "Email not found in OAuth2 user attributes", null)
-                );
-            }
+        // Include BOTH OAuth attributes AND database user details
+        attributes.put("db_user_id", user.getId());
+        attributes.put("db_username", user.getUsername());
 
-            User user = userRepository.findByEmail(email)
-                    .orElseGet(() -> {
-                        User newUser = new User();
-                        newUser.setUsername(name != null ? name : email);
-                        newUser.setEmail(email);
-                        newUser.setPassword("{noop}OAUTH2_USER");
-                        newUser.setRole("ROLE_USER");
-                        newUser.setPro(false);
-                        return userRepository.save(newUser);
-                    });
-
-            return new DefaultOAuth2User(
-                    Collections.singleton(new SimpleGrantedAuthority(user.getRole())),
-                    attributes,  // Using the full attributes map
-                    "email"     // Name attribute key
-            );
-        } catch (Exception ex) {
-            log.error("OAuth2 authentication failed", ex);
-            throw new OAuth2AuthenticationException(
-                    new OAuth2Error("authentication_error", "OAuth2 authentication failed", null),
-                    ex
-            );
-        }
+        return new DefaultOAuth2User(
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole())),
+                attributes,
+                "email" // name attribute key
+        );
     }
 }

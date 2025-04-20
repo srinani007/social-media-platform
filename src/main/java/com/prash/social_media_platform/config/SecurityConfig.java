@@ -12,6 +12,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -25,6 +28,9 @@ import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Configuration
 public class SecurityConfig {
 
@@ -36,7 +42,20 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public CustomOAuth2UserService customOAuth2UserService() {
+        return new CustomOAuth2UserService();
+    }
 
+
+    @Bean
+    public GrantedAuthoritiesMapper userAuthoritiesMapper() {
+        return authorities -> {
+            Set<GrantedAuthority> mapped = new HashSet<>(authorities);
+            mapped.add(new SimpleGrantedAuthority("ROLE_USER")); // 🔥 forcibly add ROLE_USER
+            return mapped;
+        };
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,7 +65,7 @@ public class SecurityConfig {
         }
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/register", "/h2-console/**", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/login", "/register","/oauth2/**", "/h2-console/**", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
@@ -56,11 +75,24 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/redirect-dashboard", true)
                         .permitAll()
                 )
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/redirect-dashboard", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService())
+                        )
+                        .successHandler((request, response, authentication) -> {
+                            // Custom logic after successful OAuth login
+                            response.sendRedirect("/redirect-dashboard");
+                        })
+                )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable);
+        System.out.println("GOOGLE_CLIENT_ID: " + System.getenv("GOOGLE_CLIENT_ID"));
+
         return http.build();
     }
 

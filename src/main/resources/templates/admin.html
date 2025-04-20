@@ -105,28 +105,57 @@
                     </thead>
                     <tbody th:each="user : ${users}">
                     <tr>
+                        <!-- Username -->
                         <td th:text="${user.username}">username</td>
+
+                        <!-- Email -->
                         <td th:text="${user.email}">email@example.com</td>
+
+                        <!-- Role Badge -->
                         <td>
-                            <span class="badge bg-secondary" th:text="${user.role}">ROLE_USER</span>
-                        </td>
-                        <td>
-                            <span th:classappend="${user.pro} ? 'badge bg-success' : 'badge bg-warning text-dark'"
-                                  th:text="${user.pro} ? 'Pro ✅' : 'Free ❌'">Free ❌</span>
-                        </td>
-                        <td>
-                            <form th:action="@{'/admin/promote/' + ${user.id}}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-outline-info me-2"
-                                        th:if="${user.role != 'ROLE_ADMIN'}">
-                                    Make Admin
-                                </button>
-                            </form>
-                            <a th:href="@{'/admin/make-pro/' + ${user.id}}"
-                               class="btn btn-sm btn-outline-success me-2">Make Pro</a>
-                            <a th:href="@{'/admin/delete/' + ${user.id}}"
-                               class="btn btn-sm btn-outline-danger btn-delete">Delete</a>
+        <span th:classappend="${user.role == 'ROLE_ADMIN'} ? 'bg-primary' : 'bg-secondary'"
+              class="badge" th:text="${user.role}">
+            ROLE_USER
+        </span>
                         </td>
 
+                        <!-- Pro Status Badge -->
+                        <td>
+        <span th:classappend="${user.pro} ? 'badge bg-success' : 'badge bg-warning text-dark'"
+              th:text="${user.pro} ? 'Pro ✅' : 'Free ❌'">
+            Free ❌
+        </span>
+                        </td>
+
+                        <!-- Admin Actions -->
+                        <td>
+                            <div class="d-flex flex-wrap gap-2">
+
+                                <!-- Promote to Admin (only if not already) -->
+                                <form th:if="${user.role != 'ROLE_ADMIN'}"
+                                      th:action="@{'/admin/promote/' + ${user.id}}"
+                                      method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-info">
+                                        Make Admin
+                                    </button>
+                                </form>
+
+                                <!-- Make Pro -->
+                                <form th:action="@{'/admin/users/upgrade/' + ${user.id}}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        Make Pro
+                                    </button>
+                                </form>
+
+                                <!-- Delete User -->
+                                <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        Delete User
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
