@@ -47,9 +47,11 @@
 <div th:fragment="navbar">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" th:href="@{/}">
-                <i class="fas fa-globe me-1"></i> Social<span class="text-warning">Sphere</span>
+            <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
+                <img th:src="@{/images/logo.png}" alt="Logo" width="32" height="32" class="me-2" >
+                <span class="fw-bold">Social<span class="text-warning">Sphere</span></span>
             </a>
+
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"

@@ -36,6 +36,25 @@ public class User {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    private String fullName;
+    private String profilePictureUrl;
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+
     public Long getId() {
         return id;
     }

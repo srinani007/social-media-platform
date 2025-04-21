@@ -4,6 +4,7 @@ import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +78,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-
-
+    public User getByEmail(String email) {
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
 }
