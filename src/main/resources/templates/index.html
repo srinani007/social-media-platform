@@ -2,60 +2,116 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
 <head>
     <meta charset="UTF-8">
-    <title>Welcome to SocialSphere</title>
+    <title>Admin Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#1e3c72">
 
-    <!-- Bootstrap & Font Awesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
         :root {
-            --gradient-start: #1e3c72;
-            --gradient-end: #2a5298;
-            --card-background: rgba(255, 255, 255, 0.95);
+          --gradient-start: #1e3c72;
+          --gradient-end: #2a5298;
+          --card-background: rgba(255, 255, 255, 0.95);
+          --bubble-color: rgba(255, 255, 255, 0.07);
+          --btn-accent: #0d6efd;
         }
 
         @media (prefers-color-scheme: dark) {
-            :root {
-                --gradient-start: #141e30;
-                --gradient-end: #243b55;
-                --card-background: rgba(19, 60, 101, 0.95);
-            }
+          :root {
+            --gradient-start: #141e30;
+            --gradient-end: #243b55;
+            --card-background: rgba(19, 60, 101, 0.95);
+            --bubble-color: rgba(255, 255, 255, 0.05);
+          }
         }
 
         body {
-            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            color: #f8f9fa;
-            min-height: 100vh;
+          background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+          background-size: 200% 200%;
+          animation: gradientShift 18s ease infinite;
+          font-family: 'Segoe UI', system-ui, sans-serif;
+          color: #f8f9fa;
+          min-height: 100vh;
+          overflow-x: hidden;
+          position: relative;
         }
 
         .hero {
-            padding: 100px 15px;
-            text-align: center;
+          padding: 120px 20px 100px;
+          text-align: center;
+          z-index: 1;
+          position: relative;
         }
 
-        h1.display-4 {
-            font-weight: 700;
+        .hero h1 {
+          font-weight: 700;
+          font-size: 3rem;
+          line-height: 1.2;
+          color: #ffffff;
+          text-shadow: 1px 1px 10px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+          font-size: 1.25rem;
+          color: #e2e6ea;
+          margin-top: 1rem;
+        }
+
+        .hero .btn-primary {
+          padding: 12px 28px;
+          font-weight: 600;
+          border-radius: 50px;
+          font-size: 1rem;
+          background: var(--btn-accent);
+          border: none;
+          margin-top: 30px;
+        }
+
+        .bubbles {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+        .bubble {
+          position: absolute;
+          bottom: -100px;
+          background: var(--bubble-color);
+          border-radius: 50%;
+          animation: floatUp 30s infinite ease-in-out;
+          opacity: 0.5;
+        }
+
+        .bubble:nth-child(1) { left: 15%; width: 40px; height: 40px; animation-duration: 20s; }
+        .bubble:nth-child(2) { left: 35%; width: 60px; height: 60px; animation-duration: 25s; }
+        .bubble:nth-child(3) { left: 55%; width: 30px; height: 30px; animation-duration: 18s; }
+        .bubble:nth-child(4) { left: 75%; width: 50px; height: 50px; animation-duration: 28s; }
+        .bubble:nth-child(5) { left: 85%; width: 35px; height: 35px; animation-duration: 22s; }
+
+        @keyframes floatUp {
+          0% { transform: translateY(0) scale(1); opacity: 0; }
+          50% { opacity: 0.5; }
+          100% { transform: translateY(-120vh) scale(1.1); opacity: 0; }
         }
 
         @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            body {
-                animation: none;
-            }
+          body, .bubble {
+            animation: none !important;
+          }
         }
     </style>
 </head>
@@ -64,14 +120,38 @@
 <!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
+<div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+</div>
+
 <!-- Hero Section -->
 <section class="hero d-flex flex-column justify-content-center align-items-center text-center">
     <h1 class="display-4 text-white">Welcome to <span class="text-warning">SocialSphere</span></h1>
+    <a href="/login" class="btn btn-primary">Join Now</a>
     <p class="lead text-light mb-4">
         Connect, share, and engage with a community that makes your experience extraordinary.
     </p>
     <div>
-        <a href="/login" class="btn btn-primary btn-lg me-2">
+        <a href="/login" class="btn btn-success btn-lg me-2">
             <i class="fas fa-sign-in-alt me-1"></i> Login
         </a>
         <a href="/register" class="btn btn-success btn-lg">

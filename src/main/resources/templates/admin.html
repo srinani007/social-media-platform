@@ -14,60 +14,155 @@
           crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         :root {
-            --gradient-start: #1e3c72;
-            --gradient-end: #295eb9;
-            --card-background: rgba(255, 255, 255, 0.95);
-        }
+     --gradient-start: #1e3c72;
+     --gradient-end: #295eb9;
+     --card-background: rgba(255, 255, 255, 0.95);
+     --glass-blur: 16px;
+     --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+ }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --gradient-start: #2c3e50;
-                --gradient-end: #3498db;
-                --card-background: rgba(21, 77, 190, 0.98);
-            }
-        }
+ @media (prefers-color-scheme: dark) {
+     :root {
+         --gradient-start: #2c3e50;
+         --gradient-end: #3498db;
+         --card-background: rgba(21, 77, 190, 0.98);
+         --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+     }
+ }
 
-        body {
-            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            color: #f8f9fa;
-            min-height: 100vh;
-        }
+ body {
+     background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+     background-size: 200% 200%;
+     animation: gradientShift 15s ease infinite;
+     font-family: 'Segoe UI', system-ui, sans-serif;
+     color: #f8f9fa;
+     min-height: 100vh;
+ }
 
-        .admin-title {
-            font-weight: 700;
-            color: #fff;
-        }
+ .admin-title {
+     font-weight: 700;
+     color: #fff;
+     text-shadow: 0 2px 8px rgba(15, 63, 140, 0.2);
+     position: relative;
+ }
 
-        .table thead {
-            background-color: #0f4595;
-            color: white;
-        }
+ .admin-title::after {
+     content: '';
+     position: absolute;
+     bottom: -8px;
+     left: 0;
+     width: 100%;
+     height: 2px;
+     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+ }
 
-        .card {
-            background-color: var(--card-background);
-            border-radius: 1rem;
-        }
+ .table thead {
+     background-color: #0f4595;
+     color: white;
+     backdrop-filter: blur(var(--glass-blur));
+     -webkit-backdrop-filter: blur(var(--glass-blur));
+     border-bottom: var(--glass-border);
+ }
 
-        .form-control::placeholder {
-            color: #adb5bd;
-        }
+ .card {
+     background-color: var(--card-background);
+     border-radius: 1rem;
+     backdrop-filter: blur(var(--glass-blur));
+     -webkit-backdrop-filter: blur(var(--glass-blur));
+     border: var(--glass-border);
+     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+     transition: transform 0.3s ease, box-shadow 0.3s ease;
+     overflow: hidden;
+ }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+ .card:hover {
+     transform: translateY(-5px);
+     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+ }
 
-        @media (prefers-reduced-motion: reduce) {
-            body {
-                animation: none;
-            }
-        }
+ .card::before {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     height: 4px;
+     background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+ }
+
+ .form-control {
+     background-color: rgba(255, 255, 255, 0.9);
+     border: 1px solid rgba(0, 0, 0, 0.1);
+     transition: all 0.3s ease;
+ }
+
+ .form-control:focus {
+     background-color: rgba(255, 255, 255, 0.95);
+     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+     border-color: rgba(13, 110, 253, 0.4);
+ }
+
+ .form-control::placeholder {
+     color: #adb5bd;
+     opacity: 0.8;
+ }
+
+ /* Enhanced gradient animation */
+ @keyframes gradientShift {
+     0% { background-position: 0% 50%; }
+     50% { background-position: 100% 50%; }
+     100% { background-position: 0% 50%; }
+ }
+
+ /* Glow effects for interactive elements */
+ .btn-primary {
+     position: relative;
+     overflow: hidden;
+     z-index: 1;
+ }
+
+ .btn-primary::before {
+     content: '';
+     position: absolute;
+     top: -50%;
+     left: -50%;
+     width: 200%;
+     height: 200%;
+     background: radial-gradient(circle,
+         rgba(12, 64, 218, 0.8) 0%,
+         rgba(255, 255, 255, 0) 70%);
+     transform: scale(0);
+     transition: transform 0.5s ease;
+     z-index: -1;
+ }
+
+ .btn-primary:hover::before {
+     transform: scale(1);
+ }
+
+ /* Accessibility considerations */
+ @media (prefers-reduced-motion: reduce) {
+     body {
+         animation: none;
+     }
+     .card {
+         transition: none;
+     }
+ }
+
+ /* Frosted glass effect for tables */
+ .table {
+     backdrop-filter: blur(8px);
+     -webkit-backdrop-filter: blur(8px);
+     background-color: rgba(255, 255, 255, 0.05);
+ }
+
+ .table tbody tr:hover {
+     background-color: rgba(255, 255, 255, 0.1);
+ }
     </style>
 </head>
+
 
 <body>
 <!-- Navbar -->

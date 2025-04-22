@@ -5,128 +5,142 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Join our social platform to connect with friends and communities.">
   <meta name="author" content="Social Media Platform">
-  <meta name="theme-color" content="#4facfe">
+  <meta name="theme-color" content="#00c6ff">
 
-  <title>Register - Social Media Platform</title>
+  <title>Sign Up - SocialSphere</title>
 
   <!-- Modern CSS Stack -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --gradient-start: #4facfe;
-      --gradient-end: #00f2fe;
-      --card-background: rgba(255, 255, 255, 0.98);
-      --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+      --gradient-start: #00c6ff;
+      --gradient-end: #0072ff;
+      --card-background: rgba(255, 255, 255, 0.97);
+      --font-primary: 'Inter', system-ui, sans-serif;
+      --bubble-color: rgba(255, 255, 255, 0.07);
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --gradient-start: #2c3e50;
-        --gradient-end: #3498db;
-        --card-background: rgba(102, 128, 180, 0.98);
+        --gradient-start: #0f2027;
+        --gradient-end: #203a43;
+        --card-background: rgba(32, 48, 77, 0.97);
+        --bubble-color: rgba(255, 255, 255, 0.04);
       }
     }
 
     body {
       background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      background-size: 200% 200%;
-      animation: gradientShift 15s ease infinite;
+      background-size: 300% 300%;
+      animation: gradientShift 18s ease infinite;
       font-family: var(--font-primary);
       min-height: 100vh;
       color: #1a1a1a;
+      position: relative;
     }
 
     .auth-card {
       background: var(--card-background);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      transition: all 0.3s ease;
     }
 
     .auth-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-6px);
     }
 
     .form-control {
       border-radius: 12px;
       padding: 12px 16px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid #ccc;
       font-size: 15px;
-      transition: all 0.2s ease;
     }
 
     .form-control:focus {
       border-color: var(--gradient-start);
-      box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.15);
+      box-shadow: 0 0 0 4px rgba(0, 198, 255, 0.2);
     }
 
     .form-label {
-      font-weight: 500;
-      margin-bottom: 8px;
+      font-weight: 600;
       font-size: 15px;
+      color: #212529;
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+      border: none;
+      font-weight: 600;
+      padding: 12px;
+      border-radius: 12px;
     }
 
     .btn-social {
       border-radius: 12px;
-      padding: 10px;
       font-weight: 500;
-      border: 1px solid #e0e0e0;
+      padding: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
     }
 
-    .btn-google {
-      background-color: #fff;
-      color: #757575;
-    }
-
-    .btn-github {
-      background-color: #24292e;
-      color: white;
-    }
-
-    .btn-primary {
-      background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
-      border: none;
-      padding: 12px;
-      font-weight: 600;
-      border-radius: 12px;
-    }
+    .btn-google { background-color: #fff; color: #555; border: 1px solid #ccc; }
+    .btn-github { background-color: #24292e; color: #fff; }
 
     .divider {
       display: flex;
       align-items: center;
-      margin: 20px 0;
-      color: #757575;
+      margin: 1.5rem 0;
+      color: #888;
       font-size: 14px;
     }
-
     .divider::before, .divider::after {
       content: "";
       flex: 1;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid #ccc;
+    }
+    .divider::before { margin-right: 12px; }
+    .divider::after { margin-left: 12px; }
+
+    .bubbles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
     }
 
-    .divider::before {
-      margin-right: 16px;
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      width: 40px;
+      height: 40px;
+      background: var(--bubble-color);
+      border-radius: 50%;
+      animation: rise 25s infinite ease-in-out;
+      opacity: 0.4;
     }
 
-    .divider::after {
-      margin-left: 16px;
+    .bubble:nth-child(1) { left: 10%; animation-duration: 20s; }
+    .bubble:nth-child(2) { left: 30%; animation-duration: 16s; width: 30px; height: 30px; }
+    .bubble:nth-child(3) { left: 50%; animation-duration: 18s; width: 50px; height: 50px; }
+    .bubble:nth-child(4) { left: 70%; animation-duration: 22s; width: 25px; height: 25px; }
+    .bubble:nth-child(5) { left: 90%; animation-duration: 26s; width: 35px; height: 35px; }
+
+    @keyframes rise {
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      50% { opacity: 0.5; }
+      100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
     }
 
     @keyframes gradientShift {
@@ -134,101 +148,79 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
-    @media (prefers-reduced-motion: reduce) {
-      body {
-        animation: none;
-      }
-      .auth-card {
-        transition: none;
-      }
-    }
   </style>
 </head>
 <body class="d-flex flex-column">
-<!-- Navbar Fragment -->
-<div th:replace="~{fragments/navbar :: navbar}"></div>
+<div class="bubbles">
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+  <div class="bubble"></div>
+</div>
 
-<!-- Main Content -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <main class="container my-auto py-5">
   <div class="row justify-content-center">
     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
       <div class="auth-card card p-4">
         <div class="card-body">
-          <h1 class="text-center mb-4 fw-bold" style="font-size: 28px;">
-            <span role="img" aria-hidden="true">🚀</span>
-            Create your account
-          </h1>
+          <h2 class="text-center mb-4 fw-bold">👤 Sign up to SocialSphere</h2>
 
-          <!-- Flash Messages -->
-          <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" aria-live="polite">
+          <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
             <span th:text="${success}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
-          <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" aria-live="polite">
+          <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
             <span th:text="${error}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
 
-          <!-- Registration Form -->
           <form th:action="@{/register}" th:object="${user}" method="post" novalidate>
             <div class="mb-3">
               <label for="username" class="form-label">Username</label>
-              <input id="username" type="text" th:field="*{username}" class="form-control"
-                     placeholder="Enter username" required autocomplete="username"
-                     aria-describedby="usernameHelp">
-              <div class="text-danger small mt-1" th:if="${#fields.hasErrors('username')}"
-                   th:errors="*{username}"></div>
+              <input id="username" type="text" th:field="*{username}" class="form-control" placeholder="Choose a username" required>
+              <div class="text-danger small mt-1" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
             </div>
 
             <div class="mb-3">
-              <label for="email" class="form-label">Email address</label>
-              <input id="email" type="email" th:field="*{email}" class="form-control"
-                     placeholder="Enter email" required autocomplete="email"
-                     aria-describedby="emailHelp">
-              <div class="text-danger small mt-1" th:if="${#fields.hasErrors('email')}"
-                   th:errors="*{email}"></div>
+              <label for="email" class="form-label">Email</label>
+              <input id="email" type="email" th:field="*{email}" class="form-control" placeholder="you@example.com" required>
+              <div class="text-danger small mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
             </div>
 
             <div class="mb-4">
               <label for="password" class="form-label">Password</label>
-              <input id="password" type="password" th:field="*{password}" class="form-control"
-                     placeholder="Enter password" required autocomplete="new-password"
-                     aria-describedby="passwordHelp">
-              <div class="text-danger small mt-1" th:if="${#fields.hasErrors('password')}"
-                   th:errors="*{password}"></div>
+              <input id="password" type="password" th:field="*{password}" class="form-control" placeholder="Create a password" required>
+              <div class="text-danger small mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold"
-                    aria-label="Register account">
-              Register
-            </button>
+            <button type="submit" class="btn btn-primary w-100">Create Account</button>
           </form>
 
-          <!-- Divider -->
-          <div class="divider">OR CONTINUE WITH</div>
+          <div class="divider">Or sign up with</div>
 
-          <!-- Social Auth Buttons -->
-          <div class="d-grid gap-3">
-            <a href="/oauth2/authorization/google"
-               class="btn btn-social btn-google"
-               aria-label="Register with Google">
-              <i class="fab fa-google fa-lg"></i>
-              <span>Google</span>
+          <div class="d-grid gap-2">
+            <a href="/oauth2/authorization/google" class="btn btn-social btn-google">
+              <i class="fab fa-google"></i> Google
             </a>
-            <a href="/oauth2/authorization/github"
-               class="btn btn-social btn-github"
-               aria-label="Register with GitHub">
-              <i class="fab fa-github fa-lg"></i>
-              <span>GitHub</span>
+            <a href="/oauth2/authorization/github" class="btn btn-social btn-github">
+              <i class="fab fa-github"></i> GitHub
             </a>
           </div>
 
-          <p class="text-center mt-4 mb-0 text-muted small">
-            Already have an account?
-            <a href="/login" class="text-decoration-none fw-semibold" style="color: var(--gradient-start);">
-              Login here
-            </a>
+          <p class="text-center mt-4 small">
+            Already registered? <a href="/login" class="fw-semibold text-decoration-none" style="color: var(--gradient-end);">Login</a>
           </p>
         </div>
       </div>
@@ -236,18 +228,11 @@
   </div>
 </main>
 
-<!-- Footer -->
-<footer class="bg-light text-center text-muted py-3 mt-auto">
+<footer class="text-center text-muted py-3 mt-auto">
   <div class="container">
-    <p class="mb-1 small">
-      © 2025 Social Media Platform. All rights reserved.
-    </p>
+    <p class="mb-0 small">© 2025 Social Hub. All rights reserved.</p>
   </div>
 </footer>
-
-<!-- Modern JS Stack -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 </body>
 </html>
