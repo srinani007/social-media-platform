@@ -4,34 +4,35 @@ import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class RedirectController {
 
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public RedirectController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/redirect-dashboard")
     public String redirectToDashboard(Authentication auth) {
-        String username;
+        // auth.getName() is the DB username (thanks to nameAttributeKey="db_username")
+        String username = auth.getName();
+        User user = userService.getByUsernameOrEmail(username);
 
-        // OAuth2 login: get email from OAuth2User
-        if (auth.getPrincipal() instanceof OAuth2User oAuth2User) {
-            username = oAuth2User.getAttribute("email");
-        } else {
-            // Standard login
-            username = auth.getName();
+        if (user == null) {
+            // Handle the case where the user is not found
+            throw new IllegalArgumentException("User not found for username: " + username);
         }
-
-        User user = userService.getByUsername(username);
-
-        if (user.getRole().equals("ROLE_ADMIN")) {
+        // Admins go to admin dashboard
+        if (user.getRole().contains("ADMIN")) {
             return "redirect:/admin/dashboard";
         }
 
+        // Regular users: choose pro vs free dashboard
         return user.isPro()
                 ? "redirect:/user/dashboard?pro=true"
                 : "redirect:/user/dashboard?pro=false";

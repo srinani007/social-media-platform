@@ -35,16 +35,9 @@ public class AuthController {
     public String registerUser(@Valid @ModelAttribute("user") User user,
                                BindingResult result,
                                Model model) {
-        if (result.hasErrors()) {
-            return "register";
-        }
+        if (result.hasErrors()) return "register";
 
-        // 👑 Auto-assign ADMIN role if username matches "admin"
-        if (user.getUsername().equalsIgnoreCase("admin")) {
-            user.setRole("ROLE_ADMIN");
-        } else {
-            user.setRole("ROLE_USER");
-        }
+        user.setRole(user.getUsername().equalsIgnoreCase("admin") ? "ROLE_ADMIN" : "ROLE_USER");
 
         try {
             userService.registerUser(user);
@@ -54,8 +47,6 @@ public class AuthController {
         } catch (Exception e) {
             model.addAttribute("error", "Registration failed: " + e.getMessage());
         }
-
         return "register";
     }
-
 }

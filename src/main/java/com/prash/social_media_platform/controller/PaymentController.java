@@ -2,7 +2,6 @@ package com.prash.social_media_platform.controller;
 
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
-import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.service.PayPalService;
 import com.prash.social_media_platform.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

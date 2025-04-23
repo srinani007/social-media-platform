@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel</title>
+    <title>Welcome to SocialSphere</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#1e3c72">
 
@@ -31,7 +31,7 @@
         body {
           background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
           background-size: 200% 200%;
-          animation: gradientShift 18s ease infinite;
+          animation: gradientShift 2s ease infinite;
           font-family: 'Segoe UI', system-ui, sans-serif;
           color: #f8f9fa;
           min-height: 100vh;
@@ -79,6 +79,7 @@
           z-index: 0;
           overflow: hidden;
           pointer-events: none;
+          opacity: 0.5;
         }
 
         .bubble {
@@ -86,7 +87,11 @@
           bottom: -100px;
           background: var(--bubble-color);
           border-radius: 50%;
-          animation: floatUp 30s infinite ease-in-out;
+          animation: floatUp 2s infinite ease-in-out;
+          animation-delay: 0.5s;
+          animation-duration: 20s;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
           opacity: 0.5;
         }
 
@@ -95,7 +100,22 @@
         .bubble:nth-child(3) { left: 55%; width: 30px; height: 30px; animation-duration: 18s; }
         .bubble:nth-child(4) { left: 75%; width: 50px; height: 50px; animation-duration: 28s; }
         .bubble:nth-child(5) { left: 85%; width: 35px; height: 35px; animation-duration: 22s; }
-
+        .bubble:nth-child(6) { left: 95%; width: 25px; height: 25px; animation-duration: 15s; }
+        .bubble:nth-child(7) { left: 105%; width: 45px; height: 45px; animation-duration: 30s; }
+        .bubble:nth-child(8) { left: 115%; width: 30px; height: 30px; animation-duration: 20s; }
+        .bubble:nth-child(9) { left: 125%; width: 50px; height: 50px; animation-duration: 32s; }
+        .bubble:nth-child(10) { left: 135%; width: 20px; height: 20px; animation-duration: 12s; }
+        .bubble:nth-child(11) { left: 145%; width: 40px; height: 40px; animation-duration: 24s; }
+        .bubble:nth-child(12) { left: 155%; width: 35px; height: 35px; animation-duration: 21s; }
+        .bubble:nth-child(13) { left: 165%; width: 55px; height: 55px; animation-duration: 34s; }
+        .bubble:nth-child(14) { left: 175%; width: 25px; height: 25px; animation-duration: 16s; }
+        .bubble:nth-child(15) { left: 185%; width: 45px; height: 45px; animation-duration: 31s; }
+        .bubble:nth-child(16) { left: 195%; width: 30px; height: 30px; animation-duration: 22s; }
+        .bubble:nth-child(17) { left: 205%; width: 50px; height: 50px; animation-duration: 36s; }
+        .bubble:nth-child(18) { left: 215%; width: 25px; height: 25px; animation-duration: 17s; }
+        .bubble:nth-child(19) { left: 225%; width: 45px; height: 45px; animation-duration: 33s; }
+        .bubble:nth-child(20) { left: 235%; width: 35px; height: 35px; animation-duration: 26s; }
+        
         @keyframes floatUp {
           0% { transform: translateY(0) scale(1); opacity: 0; }
           50% { opacity: 0.5; }

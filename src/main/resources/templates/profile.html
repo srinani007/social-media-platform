@@ -55,6 +55,14 @@
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             overflow: hidden;
         }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        card-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 1.25rem;
+        }
 
         .avatar {
             width: 100px;
@@ -99,6 +107,49 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+        }
+        .interaction-btn .btn {
+        transition: all 0.2s ease;
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        }
+
+        .interaction-btn .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .interaction-btn .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .interaction-btn .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .interaction-btn .btn-outline-success:hover {
+            background-color: #198754;
+            color: white;
+        }
+
+        .interaction-btn .btn-outline-warning:hover {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .comment-item {
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-left: 3px solid #0d6efd;
+        }
+
+        .comment-item:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control-sm {
+            min-width: 150px;
         }
 
         .btn-primary::before {
@@ -200,15 +251,15 @@
                     <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.username} + '&background=0d6efd&color=fff'}"
                          alt="User Avatar" class="avatar mb-2" src="https://ui-avatars.com/api/?name=John+Doe&background=0d6efd&color=fff">
                     <h4 class="mb-0 text-light" th:text="${user.username}">Username</h4>
-                    <p class="text-muted small mb-1" th:text="${user.email}">email@example.com</p>
+                    <h3 class="text-muted small mb-1" th:text="${user.email}">email@example.com</h3>
 
-                    <span class="badge rounded-pill me-2"
+                    <p class="badge rounded-pill me-2"
                           th:classappend="${user.role == 'ROLE_ADMIN'} ? 'bg-danger' : 'bg-secondary'"
-                          th:text="${user.role == 'ROLE_ADMIN'} ? 'Admin' : 'User'">User</span>
+                          th:text="${user.role == 'ROLE_ADMIN'} ? 'Admin' : 'User'">User</p>
 
-                    <span class="badge rounded-pill"
+                    <p class="badge rounded-pill"
                           th:classappend="${user.pro} ? 'bg-success' : 'bg-warning text-dark'"
-                          th:text="${user.pro} ? 'Pro User ✅' : 'Free User'">Free User</span>
+                          th:text="${user.pro} ? 'Pro User ✅' : 'Free User'">Free User</p>
                 </div>
 
                 <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}">
@@ -224,26 +275,70 @@
                         <label class="form-label">Email</label>
                         <input type="email" th:field="*{email}" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                    <button type="submit" class="btn btn-primary w-100">Update Profile</button>
                 </form>
 
-                <div class="d-flex justify-content-between mt-3">
-                    <a href="/user/dashboard" class="btn btn-outline-light btn-sm">← Dashboard</a>
-                    <a href="/payment/upgrade" class="btn btn-outline-success btn-sm">Upgrade to Pro</a>
-                </div>
-
-                <div class="d-flex flex-column align-items-center gap-3 mt-4">
-                    <a href="/user/dashboard" class="btn btn-info btn-sm text-white w-75">
-                        <i class="fas fa-list-alt me-1"></i> View My Posts
+                <div class="d-grid gap-2 mt-4">
+                    <a href="/user/dashboard" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-1"></i> Dashboard
                     </a>
-                    <a href="/logout" class="btn btn-danger btn-sm w-75">
+                    <a href="/payment/upgrade" class="btn btn-outline-success">
+                        <i class="fas fa-star me-1"></i> Upgrade to Pro
+                    </a>
+                    <a href="/logout" class="btn btn-danger">
                         <i class="fas fa-sign-out-alt me-1"></i> Logout
                     </a>
-                    <a href="/user/delete" class="btn btn-outline-danger btn-sm w-75">
+                    <a href="/user/delete" class="btn btn-danger">
                         <i class="fas fa-trash-alt me-1"></i> Delete Account
                     </a>
                 </div>
+            </div>
+        </div>
 
+        <!-- User's Posts Feed -->
+        <div class="col-lg-8">
+            <h5 class="mb-3 text-light">My Posts</h5>
+            <div th:if="${posts}" th:each="post: ${posts}" class="card mb-3 shadow-sm">
+                <div class="card-header">
+                    <strong th:text="${post.title}">Post Title</strong>
+                    <small class="text-muted float-end" th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}">Date</small>
+                </div>
+                <div class="card-body">
+                    <p th:text="${post.content}" class="card-text">Content...</p>
+                </div>
+                <div class="card-footer bg-white d-flex flex-wrap justify-content-start gap-2">
+                    <form th:action="@{/posts/{id}/like(id=${post.id})}" method="post" class="interaction-btn">
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-thumbs-up"></i> <span th:text="${likeCounts[post.id]}">0</span>
+                        </button>
+                    </form>
+                    <form th:action="@{/posts/{id}/comment(id=${post.id})}" method="post" class="interaction-btn">
+                        <label>
+                            <input name="content" class="form-control form-control-sm me-1" placeholder="Comment..." required />
+                        </label>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-comment"></i> <span th:text="${commentCounts[post.id]}">0</span>
+                        </button>
+                    </form>
+                    <form th:action="@{/posts/{id}/share(id=${post.id})}" method="post" class="interaction-btn">
+                        <button class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-share"></i> <span th:text="${shareCounts[post.id]}">0</span>
+                        </button>
+                    </form>
+                    <form th:action="@{/posts/{id}/repost(id=${post.id})}" method="post" class="interaction-btn">
+                        <button class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-retweet"></i> <span th:text="${repostCounts[post.id]}">0</span>
+                        </button>
+                    </form>
+                </div>
+                <div class="px-3 pb-3">
+                    <div th:each="c: ${commentsByPost[post.id]}" class="mb-2 comment-item" >
+                        <small><strong th:text="${c.user.username}">user</strong>: <span th:text="${c.content}">comment</span></small>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${#lists.isEmpty(posts)}" class="text-center text-muted mt-4">
+                <h4>You haven't posted anything yet.</h4>
             </div>
         </div>
     </div>

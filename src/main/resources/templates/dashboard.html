@@ -277,22 +277,53 @@
         </div>
     </div>
 
-    <!-- Post List -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-secondary text-white">Your Posts</div>
-        <div class="card-body p-0">
-            <ul class="list-group list-group-flush" th:if="${posts}">
-                <li class="list-group-item" th:each="post : ${posts}">
-                    <h6 th:text="${post.title}">Post Title</h6>
-                    <p class="mb-1 small text-muted">
-                        Posted by <strong th:text="${post.user.username}">Username</strong>
-                        on <span th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</span>
-                    </p>
-                    <p th:text="${post.content}">Post content here...</p>
-                </li>
-            </ul>
-            <div class="p-3 text-muted text-center" th:if="${#lists.isEmpty(posts)}">
-                You haven't posted anything yet.
+    <!-- Post Feed -->
+    <div th:if="${posts}" th:each="post : ${posts}" class="card mb-4 shadow-sm">
+        <div class="card-header d-flex align-items-center">
+            <img class="avatar me-2" th:src="@{'https://ui-avatars.com/api/?name=' + ${post.user.username} + '&background=6c757d&color=fff'}" alt="Avatar">
+            <div>
+                <strong th:text="${post.user.username}">Username</strong>
+                <br/>
+                <small class="text-muted" th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}">Date</small>
+            </div>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title" th:text="${post.title}">Post Title</h5>
+            <p class="card-text" th:text="${post.content}">Post content...</p>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-between flex-wrap">
+            <form th:action="@{/posts/{id}/like(id=${post.id})}" method="post" class="me-2">
+                <button type="submit" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-thumbs-up"></i>
+                    <span th:text="${likeCounts[post.id]}">0</span>
+                </button>
+            </form>
+            <form th:action="@{/posts/{id}/comment(id=${post.id})}" method="post" class="d-flex align-items-center me-2">
+                <input name="content" class="form-control form-control-sm me-1" placeholder="Comment..." required />
+                <button class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-comment"></i>
+                    <span th:text="${commentCounts[post.id]}">0</span>
+                </button>
+            </form>
+            <form th:action="@{/posts/{id}/share(id=${post.id})}" method="post" class="me-2">
+                <button class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-share"></i>
+                    <span th:text="${shareCounts[post.id]}">0</span>
+                </button>
+            </form>
+            <form th:action="@{/posts/{id}/repost(id=${post.id})}" method="post">
+                <button class="btn btn-sm btn-outline-warning">
+                    <i class="fas fa-retweet"></i>
+                    <span th:text="${repostCounts[post.id]}">0</span>
+                </button>
+            </form>
+        </div>
+        <div class="px-3 pb-3">
+            <div th:each="c : ${commentsByPost[post.id]}" class="mb-1">
+                <small>
+                    <strong th:text="${c.user.username}">user</strong>:
+                    <span th:text="${c.content}">comment text</span>
+                </small>
             </div>
         </div>
     </div>

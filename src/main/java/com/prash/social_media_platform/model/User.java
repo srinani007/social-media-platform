@@ -14,6 +14,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotBlank
     @Size(min = 3, max = 50)
     @Column(unique = true, nullable = false)
@@ -30,12 +31,8 @@ public class User {
     private String email;
 
     private String role = "ROLE_USER";
-
-
     private boolean isPro = false;
-
     private LocalDateTime createdAt = LocalDateTime.now();
-
     private String fullName;
     private String profilePictureUrl;
 
