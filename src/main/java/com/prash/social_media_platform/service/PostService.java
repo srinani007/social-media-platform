@@ -6,11 +6,14 @@ import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.repository.PostRepository;
 import com.prash.social_media_platform.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class PostService {
@@ -36,7 +39,7 @@ public class PostService {
     }
 
     public List<Post> findAllPosts() {
-        return postRepository.findAll();
+        return postRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
     public User getByUsername(String username) {
@@ -46,5 +49,15 @@ public class PostService {
 
     public List<Post> getPostsByUser(User user) {
         return postRepository.findByUser(user);
+    }
+
+    public List<Post> searchPosts(String keyword) {
+        // search in title OR content
+        List<Post> byTitle   = postRepository.findByTitleContainingIgnoreCase(keyword);
+        List<Post> byContent = postRepository.findByContentContainingIgnoreCase(keyword);
+        // merge or choose one
+        return Stream.concat(byTitle.stream(), byContent.stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

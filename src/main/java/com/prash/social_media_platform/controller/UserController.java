@@ -2,9 +2,7 @@ package com.prash.social_media_platform.controller;
 
 import com.prash.social_media_platform.model.Post;
 import com.prash.social_media_platform.model.User;
-import com.prash.social_media_platform.service.InteractionService;
-import com.prash.social_media_platform.service.PostService;
-import com.prash.social_media_platform.service.UserService;
+import com.prash.social_media_platform.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -26,6 +24,8 @@ public class UserController {
     @Autowired private UserService userService;
     @Autowired private PostService postService;
     @Autowired private InteractionService interactionService;
+    @Autowired private NotificationService notificationService;
+    @Autowired private MessageService messageService;
 
     @GetMapping("/profile")
     public String showProfile(Model model, Authentication auth) {
@@ -60,6 +60,8 @@ public class UserController {
         model.addAttribute("shareCounts", shareCounts);
         model.addAttribute("repostCounts", repostCounts);
         model.addAttribute("commentsByPost", commentsByPost);
+        model.addAttribute("unreadCount", messageService.unreadCount(auth.getName()));
+        model.addAttribute("notifications", notificationService.recent(auth.getName()));
 
         return "profile";
     }

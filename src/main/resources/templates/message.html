@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Messages - SocialSphere</n></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+    <style>
+        :root {
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
+            --card-background: rgba(255, 255, 255, 0.95);
+            --glass-blur: 12px;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.25);
+            --primary-accent: #0d6efd;
+            --secondary-accent: #ffc107;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --bubble-color: rgba(255, 255, 255, 0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --gradient-start: #141e30;
+                --gradient-end: #243b55;
+                --card-background: rgba(28, 80, 132, 0.95);
+                --glass-border: 1px solid rgba(255, 255, 255, 0.15);
+                --text-primary: #041526;
+                --text-secondary: #030c14;
+            }
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            background-size: 200% 200%;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        /* Adjust for sticky navbar */
+        .chat-wrapper {
+            display: flex;
+            height: calc(100vh - 56px);
+        }
+
+        .sidebar {
+            width: 300px;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--card-background);
+            backdrop-filter: blur(var(--glass-blur));
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Sticky header & input */
+        .chat-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: var(--card-background);
+        }
+        .message-input {
+            position: sticky;
+            bottom: 0;
+            padding: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            background: var(--card-background);
+            display: flex;
+            align-items: center;
+        }
+
+        .conversation-list .list-group-item {
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+        .conversation-list .active {
+            background: rgba(13, 110, 253, 0.1);
+            border-left: 3px solid var(--primary-accent);
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 0.75rem 1.25rem;
+            border-radius: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .from-me {
+            align-self: flex-end;
+            background: var(--primary-accent);
+            color: rgb(6, 39, 248);
+        }
+        .from-them {
+            align-self: flex-start;
+            background: #e9ecef;
+            color: var(--text-primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: var(--card-background);
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .chat-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; max-height: 40vh; }
+            .chat { height: 60vh; }
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="chat-wrapper">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+            <h5 class="mb-0 d-flex align-items-center"><i class="fas fa-paper-plane me-2"></i>New Chat</h5>
+            <button id="new-chat-btn" class="btn btn-sm btn-outline-primary">+</button>
+        </div>
+        <div id="new-chat-list" class="list-group d-none">
+            <a th:each="u : ${allUsers}"
+               th:href="@{/messages(user=${u.username})}"
+               class="list-group-item list-group-item-action"
+               th:text="${u.fullName + ' (@' + u.username + ')'}">User</a>
+        </div>
+        <ul class="list-group list-group-flush conversation-list flex-grow-1">
+            <li th:each="conv : ${conversations}"
+                th:classappend="${conv.username == selectedUser.username} ? ' active' : ''"
+                class="list-group-item d-flex align-items-center">
+                <a th:href="@{/messages(user=${conv.username})}" class="stretched-link"></a>
+                <img th:src="${conv.avatarUrl}" class="rounded-circle me-2" width="40" height="40" alt="">
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between">
+                        <strong th:text="${conv.displayName}">Name</strong>
+                        <small class="text-muted" th:text="${#temporals.format(conv.lastMessageTime,'h:mm a')}">time</small>
+                    </div>
+                    <small class="text-secondary text-truncate d-block" th:text="${conv.lastMessageSnippet}">Snippet</small>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Chat pane -->
+    <div class="chat d-flex flex-column">
+        <!-- Header -->
+        <div class="chat-header d-flex align-items-center">
+            <img th:src="${selectedUser.profilePictureUrl}" class="rounded-circle me-3" width="48" height="48" alt="">
+            <div class="flex-grow-1">
+                <h6 class="mb-0" th:text="${selectedUser.fullName}">Full Name</h6>
+                <small class="text-secondary" th:text="'@' + ${selectedUser.username}">@user</small>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages-container">
+            <div th:each="msg : ${messages}" class="d-flex mb-3"
+                 th:classappend="${msg.sender.username == #authentication.name} ? ' justify-content-end' : ' justify-content-start'">
+                <div class="message-bubble"
+                     th:classappend="${msg.sender.username == #authentication.name} ? ' from-me' : ' from-them'">
+                    <p class="mb-1" th:text="${msg.content}">Hello!</p>
+                    <small class="text-muted" th:text="${#temporals.format(msg.sentAt,'h:mm a')}">time</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <form th:action="@{/messages/send}" method="post" class="message-input">
+            <input type="hidden" name="recipient" th:value="${selectedUser.username}"/>
+            <button type="button" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <input type="text" name="content" class="form-control me-2 rounded-pill" placeholder="Write a message..." required>
+            <button type="submit" class="btn btn-primary rounded-circle">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('new-chat-btn');
+      const list = document.getElementById('new-chat-list');
+      btn.addEventListener('click', () => list.classList.toggle('d-none'));
+      const container = document.querySelector('.messages-container');
+      if (container) container.scrollTop = container.scrollHeight;
+    });
+</script>
+<footer>
+    <p class="small mb-0">© 2025 Social Hub. All rights reserved.</p>
+</footer>
+</body>
+</html>

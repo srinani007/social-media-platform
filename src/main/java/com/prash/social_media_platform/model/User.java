@@ -30,28 +30,41 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(name = "reset_token", length = 64)
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
+    @Column(nullable = false)
     private String role = "ROLE_USER";
+
+    @Column(name = "is_pro", nullable = false)
     private boolean isPro = false;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "full_name")
     private String fullName;
+
+    @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
-    public String getFullName() {
-        return fullName;
+    @Column(name = "auth_provider", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
+
+    // getters / setters
+    public AuthProvider getAuthProvider() { return authProvider; }
+    public void setAuthProvider(AuthProvider authProvider) {
+        this.authProvider = authProvider;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    // Constructors
+    public User() {}
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
-
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -84,6 +97,22 @@ public class User {
         this.email = email;
     }
 
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getResetTokenExpiry() {
+        return resetTokenExpiry;
+    }
+
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+        this.resetTokenExpiry = resetTokenExpiry;
+    }
+
     public String getRole() {
         return role;
     }
@@ -106,5 +135,21 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -120,4 +121,14 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
 
+    public User getById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+    }
+
+    public List<User> findAllExcept(String me) {
+        return userRepository.findAll().stream()
+                .filter(u -> !u.getUsername().equalsIgnoreCase(me))
+                .collect(Collectors.toList());
+    }
 }

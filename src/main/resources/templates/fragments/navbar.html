@@ -97,79 +97,136 @@
             box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
         }
         .contact-link {
-    font-weight: 600;
-    color: var(--primary-color) !important;
-}
+        font-weight: 600;
+        color: var(--primary-color) !important;
+        }
     </style>
 </head>
-
 <body>
-<div th:fragment="navbar" xmlns:th="http://www.w3.org/1999/xhtml">
+<div th:fragment="navbar">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container-fluid">
-            <!-- ✅ Brand Logo -->
+            <!-- Brand -->
             <a class="navbar-brand d-flex align-items-center"
-               th:href="@{${#authorization.expression('isAuthenticated()')} ? '/user/dashboard' : '/login'}" >
+               th:href="@{${#authorization.expression('isAuthenticated()')} ? '/user/dashboard' : '/'}">
                 <img th:src="@{/images/logo.png}" alt="Logo" width="32" height="32" class="me-2">
                 <span class="fw-bold">Social<span class="text-warning">Sphere</span></span>
             </a>
 
-            <!-- Responsive Hamburger -->
+            <!-- Toggler -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Navbar Links -->
-            <div class="collapse navbar-collapse justify-content-between" id="navbarNavDropdown">
+            <!-- Links + Search + Notifications + Auth -->
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                    <li class="nav-item" th:if="${#authorization.expression('!isAuthenticated()')}">
+                    <!-- Home / Dashboard -->
+                    <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
                         <a class="nav-link" th:href="@{/}">Home</a>
                     </li>
                     <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
                         <a class="nav-link" th:href="@{/user/dashboard}">Dashboard</a>
                     </li>
 
+                    <!-- Profile -->
                     <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
                         <a class="nav-link" th:href="@{/user/profile}">Profile</a>
                     </li>
 
+                    <!-- Admin Panel -->
                     <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                        <a class="nav-link" th:href="@{/admin}">Admin Panel</a>
+                        <a class="nav-link" th:href="@{/admin/dashboard}">Admin Panel</a>
                     </li>
 
+                    <!-- Contact -->
                     <li class="nav-item">
                         <a class="nav-link contact-link" th:href="@{/contact}">Contact</a>
                     </li>
                 </ul>
 
-                <!-- Right side: Auth buttons -->
-                <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
-                        <a class="btn btn-outline-light btn-sm me-2" th:href="@{/logout}">
-                            <i class="fas fa-sign-out-alt me-1"></i> Logout
-                        </a>
-                    </li>
-                    <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
-                        <a class="btn btn-outline-light btn-sm me-2" th:href="@{/login}">
-                            <i class="fas fa-sign-in-alt me-1"></i> Login
-                        </a>
-                    </li>
-                    <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
-                        <a class="btn btn-warning btn-sm" th:href="@{/register}">
-                            <i class="fas fa-user-plus me-1"></i> Register
-                        </a>
-                    </li>
-                </ul>
+
+                <!-- only show search on dashboard -->
+                <form class="d-flex me-3"
+                      th:if="${currentUri == '/user/dashboard'}"
+                      th:action="@{/search}" method="get">
+                    <input class="form-control form-control-sm me-1"
+                           type="search" name="q"
+                           placeholder="Search posts…"
+                           aria-label="Search"
+                           th:value="${param.q}">
+                    <button class="btn btn-outline-light btn-sm" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <div class="d-flex align-items-center">
+                    <!-- Messages -->
+                    <a class="btn btn-sm btn-outline-light position-relative me-3"
+                       th:if="${#authorization.expression('isAuthenticated()')}"
+                       th:href="@{/messages}">
+                        <i class="fas fa-envelope"></i>
+                        <span th:if="${unreadCount > 0}"
+                              class="badge bg-danger position-absolute top-0 start-100 translate-middle"
+                              th:text="${unreadCount}">0</span>
+                    </a>
+
+                    <!-- Notifications -->
+                    <div class="dropdown me-3" th:if="${#authorization.expression('isAuthenticated()')}">
+                        <button class="btn btn-sm btn-outline-light position-relative"
+                                type="button" id="notifDropdown" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                            <span th:if="${!#lists.isEmpty(notifications)}"
+                                  class="badge bg-danger position-absolute top-0 start-100 translate-middle"
+                                  th:text="${notifications.size()}">0</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="min-width: 250px;">
+                            <li th:if="${notifications.empty}">
+                                <span class="dropdown-item-text">No notifications</span>
+                            </li>
+                            <li th:each="n : ${notifications}">
+                                <a class="dropdown-item d-flex justify-content-between"
+                                   th:href="@{${n.link}}">
+                                    <span th:text="${n.title}">Title</span>
+                                    <small class="text-muted" th:text="${#temporals.format(n.timestamp, 'HH:mm')}">time</small>
+                                </a>
+                                <div class="dropdown-item-text small" th:text="${n.message}">Message…</div>
+                            </li>
+                            <li><hr class="dropdown-divider"/></li>
+                            <li><a class="dropdown-item text-center" th:href="@{/notifications}">View all</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Auth buttons -->
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                            <a class="btn btn-outline-light btn-sm me-2" th:href="@{/logout}">
+                                <i class="fas fa-sign-out-alt me-1"></i> Logout
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
+                            <a class="btn btn-outline-light btn-sm me-2" th:href="@{/login}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
+                            <a class="btn btn-warning btn-sm" th:href="@{/register}">
+                                <i class="fas fa-user-plus me-1"></i> Register
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
+    <!-- Bootstrap JS (deferred) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous" defer>
+    </script>
 </div>
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous" defer></script>
 </body>
 </html>

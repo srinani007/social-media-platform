@@ -27,7 +27,7 @@
       :root {
         --gradient-start: #0f2027;
         --gradient-end: #203a43;
-        --card-background: rgba(32, 48, 77, 0.97);
+        --card-background: rgba(156, 176, 213, 0.97);
         --bubble-color: rgba(255, 255, 255, 0.04);
       }
     }
@@ -175,7 +175,7 @@
     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
       <div class="auth-card card p-4">
         <div class="card-body">
-          <h2 class="text-center mb-4 fw-bold">👤 Sign up to SocialSphere</h2>
+          <h2 class="text-center mb-4 fw-bold">👤 Sign up For SocialSphere</h2>
 
           <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
             <span th:text="${success}"></span>
@@ -214,13 +214,10 @@
             <a href="/oauth2/authorization/google" class="btn btn-social btn-google">
               <i class="fab fa-google"></i> Google
             </a>
-            <a href="/oauth2/authorization/github" class="btn btn-social btn-github">
-              <i class="fab fa-github"></i> GitHub
-            </a>
           </div>
 
           <p class="text-center mt-4 small">
-            Already registered? <a href="/login" class="fw-semibold text-decoration-none" style="color: var(--gradient-end);">Login</a>
+            <a href="/login" class="fw-semibold text-decoration-none" >Already registered? Login</a>
           </p>
         </div>
       </div>
