@@ -51,7 +51,7 @@ public class User {
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
-    @Column(name = "auth_provider", nullable = false)
+    @Column(name = "auth_provider" , nullable = true)
     @Enumerated(EnumType.STRING)
     private AuthProvider authProvider;
 
