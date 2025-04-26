@@ -160,6 +160,40 @@
  .table tbody tr:hover {
      background-color: rgba(255, 255, 255, 0.1);
  }
+        /* Mobile‐first adjustments */
+@media (max-width: 992px) {
+  /* Tablets & small desktops */
+  .card {
+    margin: 1rem;
+  }
+  .table-responsive {
+    overflow-x: auto;
+  }
+  .btn-primary {
+    width: auto;
+    display: block;
+    margin: 0.5rem auto;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Landscape phones & portrait tablets */
+  .admin-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  .form-control, .btn-primary {
+    font-size: 0.9rem;
+  }
+  .table thead {
+    font-size: 0.85rem;
+  }
+  .table tbody tr, .table thead th {
+    padding: 0.5rem 0.75rem;
+  }
+}
+}
+
     </style>
 </head>
 
