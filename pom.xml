@@ -144,6 +144,29 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>10.20.1</version>
+				<dependencies>
+					<!-- Include the MySQL driver on Flyway’s classpath -->
+					<dependency>
+						<groupId>mysql</groupId>
+						<artifactId>mysql-connector-java</artifactId>
+						<version>8.0.33</version>        <!-- match your MySQL Connector version -->
+					</dependency>
+				</dependencies>
+				<configuration>
+					<url>jdbc:mysql://localhost:3306/social_media_db?useSSL=false&amp;serverTimezone=UTC</url>
+					<user>social_user</user>
+					<password>yourpassword</password>
+					<driver>com.mysql.cj.jdbc.Driver</driver>
+					<locations>classpath:db/migration</locations>
+				</configuration>
+			</plugin>
+
+
+
 
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
