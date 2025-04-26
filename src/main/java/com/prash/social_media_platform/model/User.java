@@ -55,8 +55,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private AuthProvider authProvider;
 
-    // getters / setters
-    public AuthProvider getAuthProvider() { return authProvider; }
+    public AuthProvider getAuthProvider() {
+        return authProvider;
+    }
+
     public void setAuthProvider(AuthProvider authProvider) {
         this.authProvider = authProvider;
     }
