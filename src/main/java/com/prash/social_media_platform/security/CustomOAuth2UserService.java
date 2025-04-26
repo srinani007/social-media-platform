@@ -62,10 +62,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     return userRepository.save(newUser);
                 });
 
-        // Optionally update existing user info
-        // user.setFullName(oauth2User.getAttribute("name"));
-        // user.setProfilePictureUrl(oauth2User.getAttribute("picture"));
-        // userRepository.save(user);
+
 
         // Add custom attributes for session
         Map<String, Object> mappedAttrs = new HashMap<>(oauth2User.getAttributes());
