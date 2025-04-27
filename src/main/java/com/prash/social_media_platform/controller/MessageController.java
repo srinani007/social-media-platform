@@ -36,7 +36,8 @@ public class MessageController {
                         String selectedUsername,
                         Model model,
                         Principal principal) {
-        String me = principal.getName();
+        User meUser = userService.getByUsernameOrEmail(principal.getName());
+        String me = meUser.getUsername();
 
         List<ConversationDto> conversations =
             messageService.listConversations(me);
@@ -46,11 +47,9 @@ public class MessageController {
         if (selectedUsername != null) {
             selectedUser = userService.getByUsernameOrEmail(selectedUsername);
         } else if (!conversations.isEmpty()) {
-            selectedUser = userService
-                .getByUsernameOrEmail(conversations.get(0).getUsername());
+            selectedUser = userService.getByUsernameOrEmail(conversations.get(0).getUsername());
         } else {
-            // no conversations yet → default to yourself
-            selectedUser = userService.getByUsernameOrEmail(me);
+            selectedUser = meUser;
         }
 
         // 3) Fetch the full thread
@@ -70,19 +69,23 @@ public class MessageController {
     public String send(@RequestParam("recipient") String recipientUsername,
                        @RequestParam("content")   String content,
                        Principal principal) {
-        User sender = userService.getByUsernameOrEmail(principal.getName());
+        // 1) Resolve sender and recipient as User entities
+        User sender    = userService.getByUsernameOrEmail(principal.getName());
         User recipient = userService.getByUsernameOrEmail(recipientUsername);
-        Message m = messageService.send(sender, recipient, null, content);
 
-        // 2) Create a notification for the recipient
+        // 2) Persist the message
+        messageService.send(sender, recipient, content);
+
+        // 3) Create a notification for the recipient
         notificationService.createNotification(
                 recipient,
-                "/messages?user=" + sender.getUsername(),             // link back to this convo
-                "New message from " + sender.getFullName()         // display text
+                "/messages?user=" + URLEncoder.encode(sender.getUsername(), StandardCharsets.UTF_8),
+                "New message from " + sender.getFullName()
         );
 
-        return "redirect:/messages?user=" + URLEncoder
-                .encode(recipientUsername, StandardCharsets.UTF_8);
+        // 4) Redirect back to this conversation thread
+        return "redirect:/messages?user=" +
+                URLEncoder.encode(recipient.getUsername(), StandardCharsets.UTF_8);
     }
 
     @PostMapping("/{id}/read")
