@@ -22,6 +22,13 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             String senderUsername,
             String recipientUsername
     );
+    // count unread from partner → me
+    long countBySenderUsernameAndRecipientUsernameAndReadFalse(
+            String senderUsername,
+            String recipientUsername
+    );
+
+
 
     // One-on-one thread sorted oldest → newest
     @Query("""

@@ -8,17 +8,28 @@ public class ConversationDto {
     private final String avatarUrl;
     private final LocalDateTime lastMessageTime;
     private final String lastMessageSnippet;
+    private long   unreadCount;
 
     public ConversationDto(String username,
                            String displayName,
                            String avatarUrl,
                            LocalDateTime lastMessageTime,
-                           String lastMessageSnippet) {
-        this.username = username;
-        this.displayName = displayName;
-        this.avatarUrl = avatarUrl;
-        this.lastMessageTime = lastMessageTime;
+                           String lastMessageSnippet,
+                           long unreadCount) {
+        this.username           = username;
+        this.displayName        = displayName;
+        this.avatarUrl          = avatarUrl;
+        this.lastMessageTime    = lastMessageTime;
         this.lastMessageSnippet = lastMessageSnippet;
+        this.unreadCount        = unreadCount;
+    }
+
+    public long getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(long unreadCount) {
+        this.unreadCount = unreadCount;
     }
 
     public String getUsername() {

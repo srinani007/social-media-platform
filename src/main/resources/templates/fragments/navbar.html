@@ -23,6 +23,10 @@
             position: relative;
             overflow: hidden;
         }
+        .navbar:hover {
+            background-color: rgba(255, 255, 255, 0.25) !important;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
 
         /* Gradient lighting effect */
         .navbar::before {
@@ -38,6 +42,20 @@
             z-index: -1;
             pointer-events: none;
             animation: rotateLight 15s linear infinite;
+        }
+        .navbar::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle,
+                rgba(255, 215, 0, 0.1) 0%,
+                rgba(255, 255, 255, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+            animation: rotateLight 30s linear infinite;
         }
 
         @keyframes rotateLight {
@@ -64,6 +82,17 @@
             color: #ffc107 !important;
             text-shadow: 0 0 8px rgba(255, 193, 7, 0.4);
         }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: #ffc107;
+            left: 0;
+            bottom: -5px;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
 
         /* Button effects */
         .btn-outline-light {
@@ -71,6 +100,20 @@
             border-color: rgba(255, 255, 255, 0.5);
             position: relative;
             overflow: hidden;
+        }
+        .btn-outline-light::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle,
+                rgba(255, 255, 255, 0.2) 0%,
+                rgba(255, 255, 255, 0) 70%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.3s ease;
+            z-index: -1;
         }
 
         .btn-outline-light:hover {
@@ -96,10 +139,40 @@
             border-radius: 4px;
             box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
         }
+        .nav-item.active .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.3);
+        }
         .contact-link {
         font-weight: 600;
         color: var(--primary-color) !important;
         }
+        .contact-link:hover {
+            color: var(--primary-color-dark) !important;
+            text-decoration: underline;
+        }
+        .navbar-toggler {
+            border: none;
+        }
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.5);
+        }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+        .navbar-collapse {
+            transition: all 0.3s ease;
+        }
+        .navbar-collapse.show {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+
+
+
     </style>
 </head>
 <body>
@@ -117,8 +190,11 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav" aria-controls="navbarNav"
                     aria-expanded="false" aria-label="Toggle navigation">
+
                 <span class="navbar-toggler-icon"></span>
+
             </button>
+
 
             <!-- Links + Search + Notifications + Auth -->
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -143,8 +219,9 @@
 
                     <!-- Contact -->
                     <li class="nav-item">
-                        <a class="nav-link contact-link" th:href="@{/contact}">Contact</a>
+                        <a class="nav-link contact-link" th:href="@{/contact}">Help</a>
                     </li>
+
                 </ul>
 
 
@@ -170,35 +247,34 @@
                         <i class="fas fa-envelope"></i>
                         <span th:if="${unreadCount > 0}"
                               class="badge bg-danger position-absolute top-0 start-100 translate-middle"
-                              th:text="${unreadCount}">0</span>
+                              th:text="${unreadCount}">
+              0
+                        </span>
                     </a>
 
                     <!-- Notifications -->
-                    <div class="dropdown me-3" th:if="${#authorization.expression('isAuthenticated()')}">
-                        <button class="btn btn-sm btn-outline-light position-relative"
-                                type="button" id="notifDropdown" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                    <div class="dropdown me-3">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle"
+                                type="button" id="notificationDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-bell"></i>
-                            <span th:if="${!#lists.isEmpty(notifications)}"
+                            <span th:if="${notificationCount > 0}"
                                   class="badge bg-danger position-absolute top-0 start-100 translate-middle"
-                                  th:text="${notifications.size()}">0</span>
+                                  th:text="${notificationCount}">
+                0
+                            </span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="min-width: 250px;">
-                            <li th:if="${notifications.empty}">
-                                <span class="dropdown-item-text">No notifications</span>
-                            </li>
-                            <li th:each="n : ${notifications}">
-                                <a class="dropdown-item d-flex justify-content-between"
-                                   th:href="@{${n.link}}">
-                                    <span th:text="${n.title}">Title</span>
-                                    <small class="text-muted" th:text="${#temporals.format(n.timestamp, 'HH:mm')}">time</small>
-                                </a>
-                                <div class="dropdown-item-text small" th:text="${n.message}">Message…</div>
-                            </li>
-                            <li><hr class="dropdown-divider"/></li>
-                            <li><a class="dropdown-item text-center" th:href="@{/notifications}">View all</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end"
+                            th:if="${#authorization.expression('isAuthenticated()')}"
+                            aria-labelledby="notificationDropdown">
+                            <li><a class="dropdown-item" th:href="@{/notifications}">View Notifications</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/notifications/mark-all-read}">Mark all as read</a></li>
                         </ul>
                     </div>
+
+
+
 
                     <!-- Auth buttons -->
                     <ul class="navbar-nav mb-2 mb-lg-0">

@@ -1,4 +1,3 @@
-// com/prash/social_media_platform/model/Message.java
 package com.prash.social_media_platform.model;
 
 import jakarta.persistence.*;

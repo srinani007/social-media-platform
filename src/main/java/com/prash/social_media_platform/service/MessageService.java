@@ -39,7 +39,7 @@ public class MessageService {
         List<Message> all = repo
                 .findBySenderUsernameOrRecipientUsernameOrderBySentAtDesc(me, me);
 
-        Map<String, ConversationDto> map = new LinkedHashMap<>();
+        Map<String,ConversationDto> map = new LinkedHashMap<>();
         for (Message m : all) {
             User partner = m.getSender().getUsername().equals(me)
                     ? m.getRecipient()
@@ -47,24 +47,27 @@ public class MessageService {
             String key = partner.getUsername();
             if (!map.containsKey(key)) {
                 String snippet = m.getContent();
-                if (snippet.length() > 50) snippet = snippet.substring(0, 50) + "...";
-
+                if (snippet.length()>50) snippet = snippet.substring(0,50)+"…";
                 LocalDateTime lastTime = LocalDateTime.ofInstant(
-                        m.getSentAt(),
-                        ZoneId.systemDefault()
-                );
+                        m.getSentAt(), ZoneId.systemDefault());
 
-                map.put(key, new ConversationDto(
+                // count unread where me is recipient and partner is sender
+                long unread = repo.countBySenderUsernameAndRecipientUsernameAndReadFalse(
+                        key, me);
+
+                map.put(key,new ConversationDto(
                         key,
                         partner.getFullName(),
                         partner.getProfilePictureUrl(),
                         lastTime,
-                        snippet
+                        snippet,
+                        unread        // ← fill this in
                 ));
             }
         }
         return new ArrayList<>(map.values());
     }
+
 
     /** Full one-on-one thread sorted oldest → newest */
     public List<Message> getThread(String me, String them) {
