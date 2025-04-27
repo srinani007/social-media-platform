@@ -15,18 +15,18 @@
 
     <style>
         :root {
-            --gradient-start: #1e3c72;
-            --gradient-end: #2a5298;
+            --gradient-start: #0c55de;
+            --gradient-end: #1e001f;
             --card-background: rgba(255, 255, 255, 0.95);
             --glass-blur: 16px;
-            --glass-border: 1px solid rgba(234, 236, 244, 0.898);
+            --glass-border: 1px solid rgba(15, 53, 207, 0.898);
             --primary-glow: rgba(65, 120, 255, 0.4);
             --text-glow: rgba(255, 255, 255, 0.8);
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --gradient-start: #141e30;
+                --gradient-start: #093580;
                 --gradient-end: #243b55;
                 --card-background: rgba(97, 164, 230, 0.163);
                 --glass-border: 1px solid rgba(255, 255, 255, 0.15);
@@ -249,7 +249,7 @@
     <div class="row w-100 justify-content-center">
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
             <div class="auth-card shadow-lg border-0">
-                <h3 class="text-center mb-4" style="font-weight: 600; color: var(--gradient-start);">
+                <h3 class="text-center mb-4" style="font-weight: 600;">
                     <i class="fas fa-sign-in-alt me-2"></i>Login to your account
                 </h3>
 
@@ -270,9 +270,12 @@
                 </div>
 
                 <!-- Login Form -->
-                <form th:action="@{/login}" method="post">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
+                <form th:action="@{/login}" method="post" >
+                    <div class="mb-3" style="color: white;">
+                        <label for="username" class="form-label" style="color: white;">
+                            <i class="fas fa-user me-2"></i>
+                            <span>Username</span>
+                        </label>
                         <input
                                 type="text"
                                 id="username"
@@ -284,7 +287,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
+                        <label for="password" class="form-label" style="color: white;">
+                            <i class="fas fa-lock me-2"></i>
+                            <span>Password</span>
+                        </label>
                         <div class="input-group">
                             <input
                                     type="password"
@@ -317,11 +323,10 @@
 
                     <button type="submit" class="btn btn-login w-100 mb-3">Log in</button>
 
-                    <div class="text-center mt-3">
+                    <div class="text-center mt-3"  style="color: white;">
                         <a
                                 th:href="@{/forgot-password}"
                                 class="text-decoration-none"
-                                style="color: var(--gradient-start); font-weight: 500;"
                         >
                             Forgot your password?
                         </a>
@@ -334,7 +339,7 @@
         <div class="text-center mb-4">
             <img src="/images/logo.png" alt="Logo" class="img-fluid" style="max-width: 150px; height: auto;">
         </div>
-        <p class="text-muted" style="font-size: 0.9rem;"  color: white;>
+        <p class="text-muted" style="font-size: 0.9rem;" >
             Don't have an account? <a th:href="@{/register}" class="text-decoration-none" style="color: white; font-weight: 500;">Sign up</a>
         </p>
         <p class="text-muted" style="font-size: 0.9rem;">
