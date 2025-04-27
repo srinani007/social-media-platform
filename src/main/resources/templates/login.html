@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto" style="font-size: 0.95rem;">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:color="http://www.w3.org/1999/xhtml" lang="en" data-bs-theme="auto"
+      style="font-size: 0.95rem;">
 <head>
     <meta charset="UTF-8">
     <title>Login - Social Media Platform</title>
@@ -27,7 +28,7 @@
             :root {
                 --gradient-start: #141e30;
                 --gradient-end: #243b55;
-                --card-background: rgba(16, 103, 189, 0.95);
+                --card-background: rgba(97, 164, 230, 0.163);
                 --glass-border: 1px solid rgba(255, 255, 255, 0.15);
                 --primary-glow: rgba(41, 98, 255, 0.6);
             }
@@ -38,9 +39,10 @@
             background-size: 200% 200%;
             font-family: 'Segoe UI', system-ui, sans-serif;
             color: #f8f9fa;
-            min-height: 50vh;
+            min-height: 100vh;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            padding-bottom: 60px; /* For footer */
         }
 
         /* Floating particles background */
@@ -79,17 +81,23 @@
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border: var(--glass-border);
             border-radius: 1.5rem;
-            padding: 2rem;
+            padding: 2.5rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
                         0 0 20px var(--primary-glow);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            margin: 2rem auto;
+            position: relative;
         }
 
-        .auth-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2),
-                        0 0 30px var(--primary-glow);
+        @media (max-width: 576px) {
+            .auth-card {
+                padding: 1rem;
+                margin: 1rem auto;
+                max-width: 350px;
+                border-radius: 1rem;
+            }
         }
 
         .auth-card::before {
@@ -98,11 +106,24 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 4px;
+            height: 2px;
             background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            animation: gradientFlow 3s ease infinite;
+            border-radius: 1rem 1rem 0 0;
         }
-
+        .auth-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+        }
+        .auth-card img {
+            max-width: 100px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
         .form-control {
             border-radius: 12px;
             padding: 12px 16px;
@@ -143,11 +164,13 @@
             overflow: hidden;
             z-index: 1;
             transition: all 0.4s ease;
+            color: white;
         }
 
         .btn-login:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px var(--primary-glow);
+            color: white;
         }
 
         .btn-login::before {
@@ -222,112 +245,123 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <!-- Main Content -->
-<div class="container d-flex justify-content-center align-items-center min-vh-100" style="position: relative;" >
-    <div class="col-md-6 col-lg-5" >
-        <div class="auth-card shadow-lg border-0">
-            <div class="text-center mb-4" style="position: relative;">
-                <img src="/images/logo.png" alt="Logo" class="img-fluid" style="max-width: 150px;">
-            </div>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 120px);">
+    <div class="row w-100 justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="auth-card shadow-lg border-0">
+                <h3 class="text-center mb-4" style="font-weight: 600; color: var(--gradient-start);">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login to your account
+                </h3>
 
-            <h3 class="text-center mb-4 text-light" style="font-weight: 600;">
-                <i class="fas fa-sign-in-alt me-2"></i>Login to your account
-            </h3>
-
-            <!-- Flash messages -->
-            <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                Invalid username or password.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <div th:if="${param.logout}" class="alert alert-info alert-dismissible fade show" role="alert">
-                You have been logged out.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-
-
-            <!-- Login Form -->
-            <form th:action="@{/login}" method="post">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            class="form-control"
-                            required
-                            autofocus
-                    />
+                <!-- Flash messages -->
+                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    Invalid username or password.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${param.logout}" class="alert alert-info alert-dismissible fade show" role="alert">
+                    You have been logged out.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="input-group">
+                <!-- Login Form -->
+                <form th:action="@{/login}" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
                         <input
-                                type="password"
-                                id="password"
-                                name="password"
+                                type="text"
+                                id="username"
+                                name="username"
                                 class="form-control"
                                 required
+                                autofocus
                         />
-                        <button 
-                                type="button"
-                                class="btn btn-outline-secondary"
-                                id="togglePassword"
-                        >
-                            <i class="fas fa-eye"></i>
-                        </button>
                     </div>
-                </div>
 
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="form-control"
+                                    required
+                            />
+                            <button
+                                    type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="togglePassword"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
 
-                <div class="form-check mb-3">
-                    <input
-                            class="form-check-input"
-                            type="checkbox"
-                            id="rememberMe"
-                            name="remember-me"
-                    />
-                    <label class="form-check-label" for="rememberMe">
-                        Remember me
-                    </label>
-                </div>
+                    <div class="form-check mb-3">
+                        <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="rememberMe"
+                                name="remember-me"
+                        />
+                        <label class="form-check-label" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
 
-                <button type="submit" class="btn btn-primary w-100">Log in</button>
+                    <button type="submit" class="btn btn-login w-100 mb-3">Log in</button>
 
-                <div class="text-center mt-3">
-                    <a
-                            th:href="@{/forgot-password}"
-                            class="text-decoration-none text-info fw-semibold"
-                    >
-                        Forgot your password?
-                    </a>
-                </div>
-            </form>
-
-            <!-- OAuth Buttons -->
-            <div class="d-grid gap-2 mt-4">
-                <a class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2"
-                   href="/oauth2/authorization/google">
-                    <i class="fab fa-google"></i> Login with Google
-                </a>
+                    <div class="text-center mt-3">
+                        <a
+                                th:href="@{/forgot-password}"
+                                class="text-decoration-none"
+                                style="color: var(--gradient-start); font-weight: 500;"
+                        >
+                            Forgot your password?
+                        </a>
+                    </div>
+                </form>
             </div>
-
-            <!-- Register Prompt -->
-            <p class="mt-4 mb-0 text-center small text-muted">
-                Don't have an account? <a href="/register" class="text-decoration-none link-light fw-semibold">Register</a>
-            </p>
         </div>
     </div>
+    <div class="auth-card shadow-lg border-0" style="color: white;">
+        <div class="text-center mb-4">
+            <img src="/images/logo.png" alt="Logo" class="img-fluid" style="max-width: 150px; height: auto;">
+        </div>
+        <p class="text-muted" style="font-size: 0.9rem;"  color: white;>
+            Don't have an account? <a th:href="@{/register}" class="text-decoration-none" style="color: white; font-weight: 500;">Sign up</a>
+        </p>
+        <p class="text-muted" style="font-size: 0.9rem;">
+            By logging in,
+            you agree to our <a th:href="@{/terms}" class="text-decoration-none"  style="color: white; font-weight: 500;">Terms of Service</a> and <a th:href="@{/privacy}" class="text-decoration-none" style="color: var(--gradient-start); font-weight: 500;">Privacy Policy</a>.
+        </p>
+        <!-- OAuth Buttons -->
+        <div class="d-grid gap-2 mt-4">
+            <a class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2"
+               href="/oauth2/authorization/google">
+                <i class="fab fa-google"></i> Login with Google
+            </a>
+        </div>
+
+        <!-- Register Prompt -->
+        <p class="mt-4 mb-0 text-center">
+            Don't have an account?
+            <a href="/register" class="text-decoration-none" style="color: var(--gradient-start); font-weight: 500;">
+                Register
+            </a>
+        </p>
+    </div>
+
 </div>
 
 <!-- Footer -->
-<footer class="bg-light text-center text-muted py-3 mt-auto shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
+<footer class="bg-light text-center text-muted py-3 shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
     <div>
         © 2025 Social Media Platform. All rights reserved.
     </div>
@@ -364,6 +398,4 @@
         </div>
     </div>
 </div>
-
-
 </html>
