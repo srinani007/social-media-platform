@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
+
 @Controller
 @RequestMapping("/posts")
 public class InteractionController {
 
     @Autowired private InteractionService interactions;
     @Autowired private HttpServletRequest request;
+    @Autowired private InteractionService interactionService;
 
     private String getRedirectBack() {
         String referer = request.getHeader("Referer");
@@ -48,5 +51,13 @@ public class InteractionController {
         interactions.repostPost(postId, auth.getName());
         return "redirect:/user/dashboard";
     }
+
+    @PostMapping("/posts/{id}/like")
+    public Map<String,Integer> likePostAjax(@PathVariable("id") Long postId,
+                                            Authentication auth) {
+        int newCount = interactionService.likePost(postId, auth.getName());
+        return Map.of("likeCount", newCount);
+    }
+
 }
 

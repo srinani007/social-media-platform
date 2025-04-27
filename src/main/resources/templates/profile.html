@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>User Profile</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1e3c72">
+    <!-- CSRF Token Meta Tags - Only added if CSRF is enabled -->
+    <meta th:if="${_csrf != null}" name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:if="${_csrf != null}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <!-- Bootstrap & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -42,6 +46,7 @@
             position: relative;
             overflow-x: hidden;
             animation: gradientShift 15s ease infinite;
+            padding-bottom: 80px; /* Added for footer space */
         }
 
         .card {
@@ -52,16 +57,20 @@
             border-radius: 1rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
                         0 0 20px var(--primary-glow);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.3s ease;
             overflow: hidden;
+            margin-bottom: 1.5rem;
         }
+
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
-        card-header {
+
+        .card-header {
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             padding: 0.75rem 1.25rem;
+            background-color: rgba(255, 255, 255, 0.7);
         }
 
         .avatar {
@@ -74,15 +83,22 @@
             transition: all 0.3s ease;
         }
 
+        @media (max-width: 576px) {
+            .avatar {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
         .avatar:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
             box-shadow: 0 0 25px rgba(13, 110, 253, 0.9);
         }
 
-        .form-label,
-        label {
+        .form-label, label {
             color: #212529;
             font-weight: 500;
+            margin-bottom: 0.5rem;
         }
 
         .form-control {
@@ -90,12 +106,12 @@
             color: #000;
             border: 1px solid rgba(0, 0, 0, 0.2);
             border-radius: 8px;
-            padding: 0.5rem;
+            padding: 0.5rem 0.75rem;
         }
 
-        .form-control::placeholder,
-        ::placeholder {
+        .form-control::placeholder {
             color: #666 !important;
+            opacity: 1;
         }
 
         .btn-primary {
@@ -107,11 +123,15 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+            padding: 0.5rem 1rem;
         }
+
         .interaction-btn .btn {
-        transition: all 0.2s ease;
-        border-radius: 20px;
-        padding: 0.25rem 0.75rem;
+            transition: all 0.2s ease;
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+            margin: 0.15rem;
         }
 
         .interaction-btn .btn:hover {
@@ -137,19 +157,17 @@
             background-color: #ffc107;
             color: #212529;
         }
+
         .comment-item {
             padding: 0.5rem;
             border-radius: 4px;
             background-color: rgba(255, 255, 255, 0.7);
             border-left: 3px solid #0d6efd;
+            margin-bottom: 0.5rem;
         }
 
         .comment-item:hover {
             background-color: rgba(255, 255, 255, 0.9);
-        }
-
-        .form-control-sm {
-            min-width: 150px;
         }
 
         .btn-primary::before {
@@ -213,6 +231,44 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .interaction-btn form {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .interaction-btn .btn {
+                flex: 1 0 auto;
+            }
+
+            .interaction-btn input.form-control {
+                min-width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                font-size: 0.9rem;
+            }
+
+            .card {
+                border-radius: 0.75rem;
+            }
+
+            .btn {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -231,61 +287,63 @@
     <div class="bubble"></div>
     <div class="bubble"></div>
     <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
 </div>
 
 <!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <!-- Main Content -->
-<div class="container py-3">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg p-4">
-
+<div class="container py-4">
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-lg-4 mb-4 mb-lg-0">
+            <div class="card shadow-lg p-3">
                 <!-- Profile Header -->
                 <div class="text-center mb-3">
                     <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.username} + '&background=0d6efd&color=fff'}"
-                         alt="User Avatar" class="avatar mb-2" src="https://ui-avatars.com/api/?name=John+Doe&background=0d6efd&color=fff">
-                    <h4 class="mb-0 text-light" th:text="${user.username}">Username</h4>
-                    <h3 class="text-muted small mb-1" th:text="${user.email}">email@example.com</h3>
+                         alt="User Avatar" class="avatar mb-2"
+                         src="https://ui-avatars.com/api/?name=John+Doe&background=0d6efd&color=fff">
+                    <h4 class="mb-1" th:text="${user.username}">Username</h4>
+                    <p class="text-muted small mb-2" th:text="${user.email}">email@example.com</p>
 
-                    <p class="badge rounded-pill me-2"
+                    <span class="badge rounded-pill me-1"
                           th:classappend="${user.role == 'ROLE_ADMIN'} ? 'bg-danger' : 'bg-secondary'"
-                          th:text="${user.role == 'ROLE_ADMIN'} ? 'Admin' : 'User'">User</p>
+                          th:text="${user.role == 'ROLE_ADMIN'} ? 'Admin' : 'User'">User</span>
 
-                    <p class="badge rounded-pill"
+                    <span class="badge rounded-pill"
                           th:classappend="${user.pro} ? 'bg-success' : 'bg-warning text-dark'"
-                          th:text="${user.pro} ? 'Pro User ✅' : 'Free User'">Free User</p>
+                          th:text="${user.pro} ? 'Pro User' : 'Free User'">Free User</span>
                 </div>
 
-                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}">
+                <!-- Flash Message -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-3" role="alert" th:text="${success}">
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
 
+                <!-- Profile Form -->
                 <form th:action="@{/user/profile}" method="post" th:object="${user}">
+                    <!-- CSRF Token - Only added if CSRF is enabled -->
+                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" th:field="*{username}" class="form-control" required>
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" th:field="*{username}" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" th:field="*{email}" class="form-control" required>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" th:field="*{email}" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Update Profile</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Update Profile</button>
                 </form>
 
-                <div class="d-grid gap-2 mt-4">
-                    <a href="/user/dashboard" class="btn btn-outline-light">
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2">
+                    <a href="/user/dashboard" class="btn btn-outline-primary">
                         <i class="fas fa-arrow-left me-1"></i> Dashboard
                     </a>
                     <a href="/payment/upgrade" class="btn btn-outline-success">
                         <i class="fas fa-star me-1"></i> Upgrade to Pro
                     </a>
-                    <a href="/user/delete" class="btn btn-danger">
+                    <a href="/user/delete" class="btn btn-outline-danger">
                         <i class="fas fa-trash-alt me-1"></i> Delete Account
                     </a>
                 </div>
@@ -294,55 +352,69 @@
 
         <!-- User's Posts Feed -->
         <div class="col-lg-8">
-            <h5 class="mb-3 text-light">My Posts</h5>
-            <div th:if="${posts}" th:each="post: ${posts}" class="card mb-3 shadow-sm">
-                <div class="card-header">
+            <h5 class="mb-3">My Posts</h5>
+
+            <div th:if="${#lists.isEmpty(posts)}" class="card text-center py-4">
+                <h4 class="text-muted">You haven't posted anything yet.</h4>
+                <a href="/user/dashboard" class="btn btn-primary mt-2">Create Your First Post</a>
+            </div>
+
+            <div th:each="post: ${posts}" class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <strong th:text="${post.title}">Post Title</strong>
-                    <small class="text-muted float-end" th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}">Date</small>
+                    <small class="text-muted" th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}">Date</small>
                 </div>
                 <div class="card-body">
                     <p th:text="${post.content}" class="card-text">Content...</p>
                 </div>
-                <div class="card-footer bg-white d-flex flex-wrap justify-content-start gap-2">
-                    <form th:action="@{/posts/{id}/like(id=${post.id})}" method="post" class="interaction-btn">
-                        <button class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-thumbs-up"></i> <span th:text="${likeCounts[post.id]}">0</span>
-                        </button>
-                    </form>
-                    <form th:action="@{/posts/{id}/comment(id=${post.id})}" method="post" class="interaction-btn">
-                        <label>
+                <div class="card-footer bg-white">
+                    <div class="d-flex flex-wrap interaction-btn">
+                        <form th:action="@{/posts/{id}/like(id=${post.id})}" method="post" class="me-2 mb-2">
+                            <!-- CSRF Token - Only added if CSRF is enabled -->
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-thumbs-up"></i> <span th:text="${likeCounts[post.id]}">0</span>
+                            </button>
+                        </form>
+
+                        <form th:action="@{/posts/{id}/comment(id=${post.id})}" method="post" class="d-flex flex-grow-1 me-2 mb-2">
+                            <!-- CSRF Token - Only added if CSRF is enabled -->
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                             <input name="content" class="form-control form-control-sm me-1" placeholder="Comment..." required />
-                        </label>
-                        <button class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-comment"></i> <span th:text="${commentCounts[post.id]}">0</span>
-                        </button>
-                    </form>
-                    <form th:action="@{/posts/{id}/share(id=${post.id})}" method="post" class="interaction-btn">
-                        <button class="btn btn-sm btn-outline-success">
-                            <i class="fas fa-share"></i> <span th:text="${shareCounts[post.id]}">0</span>
-                        </button>
-                    </form>
-                    <form th:action="@{/posts/{id}/repost(id=${post.id})}" method="post" class="interaction-btn">
-                        <button class="btn btn-sm btn-outline-warning">
-                            <i class="fas fa-retweet"></i> <span th:text="${repostCounts[post.id]}">0</span>
-                        </button>
-                    </form>
-                </div>
-                <div class="px-3 pb-3">
-                    <div th:each="c: ${commentsByPost[post.id]}" class="mb-2 comment-item" >
-                        <small><strong th:text="${c.user.username}">user</strong>: <span th:text="${c.content}">comment</span></small>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-comment"></i> <span th:text="${commentCounts[post.id]}">0</span>
+                            </button>
+                        </form>
+
+                        <form th:action="@{/posts/{id}/share(id=${post.id})}" method="post" class="me-2 mb-2">
+                            <!-- CSRF Token - Only added if CSRF is enabled -->
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-share"></i> <span th:text="${shareCounts[post.id]}">0</span>
+                            </button>
+                        </form>
+
+                        <form th:action="@{/posts/{id}/repost(id=${post.id})}" method="post" class="mb-2">
+                            <!-- CSRF Token - Only added if CSRF is enabled -->
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-retweet"></i> <span th:text="${repostCounts[post.id]}">0</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div th:if="${commentsByPost[post.id]}" class="mt-2">
+                        <div th:each="c: ${commentsByPost[post.id]}" class="comment-item">
+                            <small><strong th:text="${c.user.username}">user</strong>: <span th:text="${c.content}">comment</span></small>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div th:if="${#lists.isEmpty(posts)}" class="text-center text-muted mt-4">
-                <h4>You haven't posted anything yet.</h4>
             </div>
         </div>
     </div>
 </div>
-
 <!-- Footer -->
-<footer class="bg-light text-center text-muted py-3 mt-auto shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
+<footer class="bg-light text-center text-muted py-3 shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
     <div>
         © 2025 Social Media Platform. All rights reserved.
     </div>

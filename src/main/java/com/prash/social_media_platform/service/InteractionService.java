@@ -19,7 +19,7 @@ public class InteractionService {
     @Autowired private PostService postService;
 
     @Transactional
-    public void likePost(Long postId, String username) {
+    public int likePost(Long postId, String username) {
         User u = userService.getByUsernameOrEmail(username);
         Post p = postService.findAllPosts().stream()
                 .filter(x->x.getId().equals(postId))
@@ -31,6 +31,7 @@ public class InteractionService {
             like.setPost(p);
             likeRepo.save(like);
         }
+        return (int) likeRepo.countByPostId(postId);
     }
 
     @Transactional

@@ -3,207 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Panel</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#1e3c72">
+    <!-- CSRF Meta Tags -->
+    <meta th:if="${_csrf != null}" name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:if="${_csrf != null}" name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <!-- Bootstrap & FontAwesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
     <style>
         :root {
-     --gradient-start: #1e3c72;
-     --gradient-end: #295eb9;
-     --card-background: rgba(255, 255, 255, 0.95);
-     --glass-blur: 16px;
-     --glass-border: 1px solid rgba(255, 255, 255, 0.2);
- }
+            --gradient-start: #1e3c72;
+            --gradient-end: #295eb9;
+            --card-background: rgba(255, 255, 255, 0.95);
+            --glass-blur: 16px;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
- @media (prefers-color-scheme: dark) {
-     :root {
-         --gradient-start: #2c3e50;
-         --gradient-end: #3498db;
-         --card-background: rgba(21, 77, 190, 0.98);
-         --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-     }
- }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --gradient-start: #2c3e50;
+                --gradient-end: #3498db;
+                --card-background: rgba(21, 77, 190, 0.98);
+                --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
 
- body {
-     background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
-     background-size: 200% 200%;
-     animation: gradientShift 15s ease infinite;
-     font-family: 'Segoe UI', system-ui, sans-serif;
-     color: #f8f9fa;
-     min-height: 100vh;
- }
+        body {
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: #f8f9fa;
+            min-height: 100vh;
+            padding-bottom: 80px; /* Space for footer */
+        }
 
- .admin-title {
-     font-weight: 700;
-     color: #fff;
-     text-shadow: 0 2px 8px rgba(15, 63, 140, 0.2);
-     position: relative;
- }
+        .admin-title {
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(15, 63, 140, 0.2);
+            position: relative;
+        }
 
- .admin-title::after {
-     content: '';
-     position: absolute;
-     bottom: -8px;
-     left: 0;
-     width: 100%;
-     height: 2px;
-     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
- }
+        .admin-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+        }
 
- .table thread {
-     background-color: #0f4595;
-     color: white;
-     backdrop-filter: blur(var(--glass-blur));
-     -webkit-backdrop-filter: blur(var(--glass-blur));
-     border-bottom: var(--glass-border);
- }
+        .card {
+            background-color: var(--card-background);
+            border-radius: 1rem;
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
 
- .card {
-     background-color: var(--card-background);
-     border-radius: 1rem;
-     backdrop-filter: blur(var(--glass-blur));
-     -webkit-backdrop-filter: blur(var(--glass-blur));
-     border: var(--glass-border);
-     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-     transition: transform 0.3s ease, box-shadow 0.3s ease;
-     overflow: hidden;
- }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
 
- .card:hover {
-     transform: translateY(-5px);
-     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
- }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+        }
 
- .card::before {
-     content: '';
-     position: absolute;
-     top: 0;
-     left: 0;
-     right: 0;
-     height: 4px;
-     background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
- }
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
- .form-control {
-     background-color: rgba(255, 255, 255, 0.9);
-     border: 1px solid rgba(0, 0, 0, 0.1);
-     transition: all 0.3s ease;
- }
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            border-color: rgba(13, 110, 253, 0.4);
+        }
 
- .form-control:focus {
-     background-color: rgba(255, 255, 255, 0.95);
-     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-     border-color: rgba(13, 110, 253, 0.4);
- }
+        .form-control::placeholder {
+            color: #adb5bd;
+            opacity: 0.8;
+        }
 
- .form-control::placeholder {
-     color: #adb5bd;
-     opacity: 0.8;
- }
+        /* Enhanced gradient animation */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
- /* Enhanced gradient animation */
- @keyframes gradientShift {
-     0% { background-position: 0% 50%; }
-     50% { background-position: 100% 50%; }
-     100% { background-position: 0% 50%; }
- }
+        /* Table styling */
+        .table thead {
+            background-color: rgba(15, 69, 149, 0.9);
+            color: white;
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-bottom: var(--glass-border);
+        }
 
- /* Glow effects for interactive elements */
- .btn-primary {
-     position: relative;
-     overflow: hidden;
-     z-index: 1;
- }
+        .table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
 
- .btn-primary::before {
-     content: '';
-     position: absolute;
-     top: -50%;
-     left: -50%;
-     width: 200%;
-     height: 200%;
-     background: radial-gradient(circle,
-         rgba(12, 64, 218, 0.8) 0%,
-         rgba(255, 255, 255, 0) 70%);
-     transform: scale(0);
-     transition: transform 0.5s ease;
-     z-index: -1;
- }
+       /* Mobile-First Adjustments */
+        @media (max-width: 767.98px) {
+            .admin-card {
+                border-radius: 0.5rem;
+                margin-left: -12px;
+                margin-right: -12px;
+            }
 
- .btn-primary:hover::before {
-     transform: scale(1);
- }
+            .table-responsive {
+                padding: 0;
+            }
 
- /* Accessibility considerations */
- @media (prefers-reduced-motion: reduce) {
-     body {
-         animation: none;
-     }
-     .card {
-         transition: none;
-     }
- }
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem !important;
+            }
 
- /* Frosted glass effect for tables */
- .table {
-     backdrop-filter: blur(8px);
-     -webkit-backdrop-filter: blur(8px);
-     background-color: rgba(255, 255, 255, 0.05);
- }
+            .action-buttons .btn {
+                width: 100%;
+                font-size: 0.85rem;
+                padding: 0.35rem 0.5rem;
+            }
+        }
 
- .table body tr:hover {
-     background-color: rgba(255, 255, 255, 0.1);
- }
-        /* Mobile‐first adjustments */
-@media (max-width: 992px) {
-  /* Tablets & small desktops */
-  .card {
-    margin: 1rem;
-  }
-  .table-responsive {
-    overflow-x: auto;
-  }
-  .btn-primary {
-    width: auto;
-    display: block;
-    margin: 0.5rem auto;
-  }
-}
+        /* Tablet Adjustments */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .admin-card {
+                margin-bottom: 1.25rem;
+            }
 
-@media (max-width: 768px) {
-  /* Landscape phones & portrait tablets */
-  .admin-title {
-    font-size: 1.5rem;
-    text-align: center;
-  }
-  .form-control, .btn-primary {
-    font-size: 0.9rem;
-  }
-  .table thread {
-    font-size: 0.85rem;
-  }
-  .table body try, .table thread th {
-    padding: 0.5rem 0.75rem;
-  }
-}
-}
+            .action-buttons {
+                flex-wrap: wrap;
+                gap: 0.5rem !important;
+            }
+        }
 
+        /* Desktop Enhancements */
+        @media (min-width: 992px) {
+            .admin-card {
+                margin-bottom: 1.5rem;
+            }
+
+            .table-responsive {
+                overflow: visible;
+            }
+        }
+
+        /* Accessibility Improvements */
+        @media (prefers-reduced-motion) {
+            body, .admin-card {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+
+    }
     </style>
 </head>
-
 
 <body>
 <!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <!-- Main Content -->
-<div class="container py-5">
+<div class="container py-4">
     <div class="mb-4 text-center">
         <h2 class="admin-title">Admin Dashboard</h2>
         <p class="text-light opacity-75">Manage all users and their access levels</p>
@@ -234,36 +217,28 @@
                     </thead>
                     <tbody th:each="user : ${users}">
                     <tr>
-                        <!-- Username -->
                         <td th:text="${user.username}">username</td>
-
-                        <!-- Email -->
                         <td th:text="${user.email}">email@example.com</td>
-
-                        <!-- Role Badge -->
                         <td>
-        <span th:classappend="${user.role == 'ROLE_ADMIN'} ? 'bg-primary' : 'bg-secondary'"
-              class="badge" th:text="${user.role}">
-            ROLE_USER
-        </span>
+                            <span th:classappend="${user.role == 'ROLE_ADMIN'} ? 'bg-primary' : 'bg-secondary'"
+                                  class="badge" th:text="${user.role == 'ROLE_ADMIN'} ? 'Admin' : 'User'">
+                                User
+                            </span>
                         </td>
-
-                        <!-- Pro Status Badge -->
                         <td>
-        <span th:classappend="${user.pro} ? 'badge bg-success' : 'badge bg-warning text-dark'"
-              th:text="${user.pro} ? 'Pro ✅' : 'Free ❌'">
-            Free ❌
-        </span>
+                            <span th:classappend="${user.pro} ? 'badge bg-success' : 'badge bg-warning text-dark'"
+                                  th:text="${user.pro} ? 'Pro ✅' : 'Free ❌'">
+                                Free ❌
+                            </span>
                         </td>
-
-                        <!-- Admin Actions -->
                         <td>
-                            <div class="d-flex flex-wrap gap-2">
+                            <div class="d-flex flex-wrap gap-2 action-buttons">
 
-                                <!-- Promote to Admin (only if not already) -->
+                                <!-- Promote to Admin -->
                                 <form th:if="${user.role != 'ROLE_ADMIN'}"
                                       th:action="@{'/admin/promote/' + ${user.id}}"
                                       method="post">
+                                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                                     <button type="submit" class="btn btn-sm btn-outline-info">
                                         Make Admin
                                     </button>
@@ -271,14 +246,16 @@
 
                                 <!-- Make Pro -->
                                 <form th:action="@{'/admin/users/upgrade/' + ${user.id}}" method="post">
+                                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                                     <button type="submit" class="btn btn-sm btn-outline-success">
                                         Make Pro
                                     </button>
                                 </form>
 
                                 <!-- Delete User -->
-                                <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post" class="delete-form">
+                                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger btn-delete">
                                         Delete User
                                     </button>
                                 </form>
@@ -307,25 +284,42 @@
 </div>
 
 <!-- Footer -->
-<footer class="bg-light text-center text-muted py-3 mt-5 shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
+<footer class="bg-light text-center text-muted py-3 shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
     <div>
         © 2025 Social Media Platform. All rights reserved.
     </div>
 </footer>
 
 <!-- JS Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 
 <script>
-    // Confirm before delete
-    document.querySelectorAll('.btn-delete').forEach(function (button) {
-        button.addEventListener('click', function (event) {
-            if (!confirm('Are you sure you want to delete this user?')) {
-                event.preventDefault();
-            }
+    // Enhanced delete confirmation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Delete confirmation
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('This will permanently delete the user. Continue?')) {
+                    e.preventDefault();
+                }
+            });
         });
+
+        // Responsive table adjustments
+        function adjustTable() {
+            if (window.innerWidth < 768) {
+                document.querySelectorAll('.admin-table thead th:nth-child(2)').forEach(th => {
+                    th.classList.add('d-none');
+                });
+            } else {
+                document.querySelectorAll('.admin-table thead th').forEach(th => {
+                    th.classList.remove('d-none');
+                });
+            }
+        }
+
+        window.addEventListener('resize', adjustTable);
+        adjustTable();
     });
 </script>
 </body>

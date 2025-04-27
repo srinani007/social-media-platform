@@ -140,6 +140,7 @@
 <!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
+<!-- Background Bubbles -->
 <div class="bubbles">
     <div class="bubble"></div>
     <div class="bubble"></div>
@@ -165,10 +166,14 @@
 
 <!-- Hero Section -->
 <section class="hero d-flex flex-column justify-content-center align-items-center text-center">
+    <div class="bg-light rounded-circle p-3 mb-4" >
+        <i class="fas fa-users fa-5x text-primary"></i>
+    </div>
+    <h2 class="text-white mb-4">Join the Community</h2>
     <h1 class="display-4 text-white">Welcome to <span class="text-warning">SocialSphere</span></h1>
     <a href="/login" class="btn btn-primary">Join Us</a>
     <p class="lead text-light mb-4">
-        Connect, share, and engage with a community that makes your experience extraordinary.
+        Connect with friends, share your moments, and explore the world around you.
     </p>
     <div>
         <a href="/login" class="btn btn-success btn-lg me-2">
@@ -179,6 +184,7 @@
         </a>
     </div>
 </section>
+
 
 <!-- Footer -->
 <footer class="bg-light text-center text-muted py-3 mt-auto shadow-sm" style="position: fixed; bottom: 0; width: 100%;">

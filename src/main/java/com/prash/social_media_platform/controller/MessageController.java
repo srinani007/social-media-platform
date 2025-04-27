@@ -7,10 +7,13 @@ import com.prash.social_media_platform.service.MessageService;
 import com.prash.social_media_platform.service.NotificationService;
 import com.prash.social_media_platform.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.List;
 
@@ -28,7 +31,6 @@ public class MessageController {
         this.notificationService = notificationService;
     }
 
-
     @GetMapping
     public String inbox(@RequestParam(value = "user", required = false)
                         String selectedUsername,
@@ -36,7 +38,6 @@ public class MessageController {
                         Principal principal) {
         String me = principal.getName();
 
-        // 1) All conversation partners + last‐message info
         List<ConversationDto> conversations =
             messageService.listConversations(me);
 
@@ -80,7 +81,8 @@ public class MessageController {
                 "New message from " + sender.getFullName()         // display text
         );
 
-        return "redirect:/messages?user=" + recipientUsername;
+        return "redirect:/messages?user=" + URLEncoder
+                .encode(recipientUsername, StandardCharsets.UTF_8);
     }
 
     @PostMapping("/{id}/read")
@@ -89,4 +91,5 @@ public class MessageController {
         messageService.markRead(messageId);
         return "redirect:/messages?user=" + selectedUsername;
     }
+
 }

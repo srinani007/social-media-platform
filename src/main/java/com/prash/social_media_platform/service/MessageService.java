@@ -1,15 +1,17 @@
+
+// MessageService.java
 package com.prash.social_media_platform.service;
 
 import com.prash.social_media_platform.dto.ConversationDto;
 import com.prash.social_media_platform.model.Message;
 import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.repository.MessageRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class MessageService {
@@ -17,6 +19,10 @@ public class MessageService {
 
     public MessageService(MessageRepository repo) {
         this.repo = repo;
+    }
+
+    public Message send(User sender, User recipient, String content) {
+        return send(sender, recipient, null, content);
     }
 
     public Message send(User sender, User recipient, String subject, String content) {
@@ -33,31 +39,26 @@ public class MessageService {
         List<Message> all = repo
                 .findBySenderUsernameOrRecipientUsernameOrderBySentAtDesc(me, me);
 
-        LinkedHashMap<String, ConversationDto> map = new LinkedHashMap<>();
+        Map<String, ConversationDto> map = new LinkedHashMap<>();
         for (Message m : all) {
-            // determine the other party
             User partner = m.getSender().getUsername().equals(me)
                     ? m.getRecipient()
                     : m.getSender();
             String key = partner.getUsername();
             if (!map.containsKey(key)) {
-                // snippet logic unchanged
                 String snippet = m.getContent();
-                if (snippet.length() > 50) {
-                    snippet = snippet.substring(0, 50) + "...";
-                }
+                if (snippet.length() > 50) snippet = snippet.substring(0, 50) + "...";
 
-                // convert Instant to LocalDateTime here:
                 LocalDateTime lastTime = LocalDateTime.ofInstant(
-                        m.getSentAt(),                // your Instant timestamp
-                        ZoneId.systemDefault()        // server’s default zone
+                        m.getSentAt(),
+                        ZoneId.systemDefault()
                 );
 
                 map.put(key, new ConversationDto(
                         key,
                         partner.getFullName(),
                         partner.getProfilePictureUrl(),
-                        lastTime,    // now a LocalDateTime
+                        lastTime,
                         snippet
                 ));
             }
@@ -84,5 +85,19 @@ public class MessageService {
             m.setRead(true);
             repo.save(m);
         });
+    }
+
+    /** Combined inbox & sent for full message list */
+    public List<Message> getMessagesForUser(String username) {
+        return repo.findBySenderUsernameOrRecipientUsernameOrderBySentAtDesc(username, username);
+    }
+
+    @Transactional
+    public void markAllAsRead(String username) {
+        repo.markAllRead(username);
+    }
+
+    public long countUnreadMessages(String username) {
+        return repo.countByRecipientUsernameAndReadFalse(username);
     }
 }

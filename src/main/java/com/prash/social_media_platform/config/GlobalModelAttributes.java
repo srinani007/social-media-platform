@@ -34,10 +34,12 @@ public class GlobalModelAttributes {
     }
 
     @ModelAttribute("unreadCount")
-    public int unreadCount(Authentication auth) {
-        return (auth != null && auth.isAuthenticated())
-                ? messageService.unreadCount(auth.getName())
-                : 0;
+    public long unreadCount(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated()) {
+            return 0;
+        }
+        // e.g. countUnreadMessages(username) returns a long
+        return messageService.countUnreadMessages(auth.getName());
     }
 
     @ModelAttribute("notifications")

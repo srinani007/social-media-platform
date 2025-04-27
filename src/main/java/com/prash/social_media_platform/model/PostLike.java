@@ -7,13 +7,18 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "post_likes")
 public class PostLike {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne @JoinColumn(name="user_id", nullable=false)
+    // who liked
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne @JoinColumn(name="post_id", nullable=false)
+    // which post
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     private LocalDateTime createdAt = LocalDateTime.now();

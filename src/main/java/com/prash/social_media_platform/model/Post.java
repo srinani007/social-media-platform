@@ -5,6 +5,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
@@ -17,7 +19,8 @@ public class Post {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user_post"))
     @OnDelete(action = OnDeleteAction.CASCADE) // ✅ add this line
     private User user;
@@ -26,6 +29,34 @@ public class Post {
 
     @Column(nullable = false)
     private String title;
+
+    @OneToMany(mappedBy = "post",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private Set<PostLike> likes = new HashSet<>();
+
+    @Transient
+    public int getLikeCount() {
+        return likes == null ? 0 : likes.size();
+    }
+
+    public Post() {
+        this.id = id;
+        this.content = content;
+        this.user = user;
+        this.createdAt = createdAt;
+        this.title = title;
+        this.likes = likes;
+    }
+
+    public Set<PostLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<PostLike> likes) {
+        this.likes = likes;
+    }
 
     public String getTitle() {
         return title;
