@@ -6,7 +6,7 @@
 
 ## Welcome to **SocialSphere 3.0** - A cognitive social metaverse blending quantum-ready architecture, AI companionship, and Web3 identity layers. Built for the post-AGI era with **Java 21 LTS**, **Spring Boot 4.0**, and **Project Loom** virtual threads.
 
-# 🔗 **Live Demo**: [Experience SocialSphere on AWS Lightsail+](https://socialsphere.nexus)  
+# 🔗 **Live Demo**: [Experience SocialSphere on AWS Lightsail+](https://social-media-platform-sdi1.onrender.com)  
 🌐 **Metaverse Portal**: [Decentraland Integration](https://play.decentraland.org/?SOCIALSPHERE)
 
 # 🚀 Hyper-Stack Architecture
