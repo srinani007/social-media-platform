@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:color="http://www.w3.org/1999/xhtml" lang="en" data-bs-theme="auto"
-      style="font-size: 0.95rem;">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto">
 <head>
     <meta charset="UTF-8">
     <title>Login - Social Media Platform</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1e3c72">
+    <title>Login - Social Media Platform</title>
 
     <!-- Bootstrap & Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -15,25 +16,26 @@
 
     <style>
         :root {
-            --gradient-start: #0c55de;
-            --gradient-end: #1e001f;
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
             --card-background: rgba(255, 255, 255, 0.95);
-            --glass-blur: 16px;
-            --glass-border: 1px solid rgba(15, 53, 207, 0.898);
+            --glass-blur: 12px;
+            --glass-border: 1px solid rgba(255, 255, 255, 0.25);
             --primary-glow: rgba(65, 120, 255, 0.4);
             --text-glow: rgba(255, 255, 255, 0.8);
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --gradient-start: #093580;
+                --gradient-start: #141e30;
                 --gradient-end: #243b55;
-                --card-background: rgba(97, 164, 230, 0.163);
+                --card-background: rgba(28, 80, 132, 0.95);
                 --glass-border: 1px solid rgba(255, 255, 255, 0.15);
                 --primary-glow: rgba(41, 98, 255, 0.6);
+                --text-glow: rgba(200, 220, 255, 0.9);
+                --bubble-color: rgba(255, 255, 255, 0.07);
             }
         }
-
         body {
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             background-size: 200% 200%;
@@ -42,137 +44,60 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            padding-bottom: 60px; /* For footer */
+            --bubble-color: rgba(255, 255, 255, 0.05);
+            padding-bottom: 100px; /* Added for footer space */
         }
 
-        /* Floating particles background */
-        body::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background:
-                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 25%),
-                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0%, transparent 25%);
-            animation: particleMove 25s linear infinite;
-            z-index: -1;
-        }
 
-        /* Floating light orb */
-        body::after {
-            content: '';
-            position: absolute;
-            bottom: -25%;
-            right: -25%;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle at 70% 70%,
-                          rgba(255, 255, 255, 0.05) 0%,
-                          transparent 60%);
-            animation: orbPulse 15s ease infinite alternate;
-            z-index: -1;
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
         }
-
         .auth-card {
             background: var(--card-background);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border: var(--glass-border);
             border-radius: 1.5rem;
-            padding: 2.5rem;
+            padding: 2rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
                         0 0 20px var(--primary-glow);
-            width: 100%;
-            max-width: 400px;
+            width: 90%; max-width: 400px;
             height: auto;
             margin: 2rem auto;
             position: relative;
         }
-
-        @media (max-width: 576px) {
-            .auth-card {
-                padding: 1rem;
-                margin: 1rem auto;
-                max-width: 350px;
-                border-radius: 1rem;
-            }
-        }
-
-        .auth-card::before {
+        .auth-card::before, .auth-card::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            border-radius: 1rem 1rem 0 0;
-        }
-        .auth-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
+            width: 100%; height: 2px;
             background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
         }
-        .auth-card img {
-            max-width: 100px;
-            height: auto;
-            margin-bottom: 1rem;
-        }
-        .form-control {
-            border-radius: 12px;
-            padding: 12px 16px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            background-color: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
-        }
+        .auth-card::before { top: 0; left: 0; border-radius: 1rem 1rem 0 0; }
+        .auth-card::after  { bottom: 0; left: 0; }
 
         .form-control:focus {
             border-color: var(--gradient-start);
             box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.25);
-            background-color: white;
+            background: #fff;
         }
-
-        .form-control::placeholder {
-            color: #adb5bd;
-            opacity: 0.8;
-        }
-
-        .form-label {
-            color: #495057;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus + .form-label {
-            color: var(--gradient-start);
-        }
-
         .btn-login {
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             border: none;
-            padding: 12px;
+            padding: 0.75rem;
             font-weight: 600;
             border-radius: 12px;
             box-shadow: 0 4px 15px var(--primary-glow);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
+            color: #fff;
             transition: all 0.4s ease;
-            color: white;
         }
-
         .btn-login:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px var(--primary-glow);
             color: white;
         }
-
         .btn-login::before {
             content: '';
             position: absolute;
@@ -187,9 +112,9 @@
             transition: 0.5s;
             z-index: -1;
         }
-
-        .btn-login:hover::before {
-            left: 100%;
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--primary-glow);
         }
 
         /* Animations */
@@ -228,6 +153,39 @@
                 transition: none !important;
             }
         }
+
+        @media (max-width: 576px) {
+        .main {
+            align-items: flex-start;
+            min-height: auto;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .auth-card {
+            padding: 1.5rem;
+            margin: 1rem auto;
+            border-radius: 1rem;
+        }
+
+        .btn-login {
+            padding: 0.5rem;
+            font-weight: 500;
+        }
+        .footer-fixed {
+            position: static !important;
+        }
+    }
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn-outline-danger i {
+        margin-right: 0.5rem;
+    }
     </style>
 </head>
 <body>
@@ -244,128 +202,56 @@
 <!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
+
 <!-- Main Content -->
-<div class="container d-flex justify-content-center align-items-center" style="min-height: calc(100vh - 120px);">
-    <div class="row w-100 justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div class="auth-card shadow-lg border-0">
-                <h3 class="text-center mb-4" style="font-weight: 600;">
-                    <i class="fas fa-sign-in-alt me-2"></i>Login to your account
-                </h3>
 
-                <!-- Flash messages -->
-                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    Invalid username or password.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <div th:if="${param.logout}" class="alert alert-info alert-dismissible fade show" role="alert">
-                    You have been logged out.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" th:text="${success}">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" th:text="${error}">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-
-                <!-- Login Form -->
-                <form th:action="@{/login}" method="post" >
-                    <div class="mb-3" style="color: white;">
-                        <label for="username" class="form-label" style="color: white;">
-                            <i class="fas fa-user me-2"></i>
-                            <span>Username</span>
-                        </label>
-                        <input
-                                type="text"
-                                id="username"
-                                name="username"
-                                class="form-control"
-                                required
-                                autofocus
-                        />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label" style="color: white;">
-                            <i class="fas fa-lock me-2"></i>
-                            <span>Password</span>
-                        </label>
-                        <div class="input-group">
-                            <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    class="form-control"
-                                    required
-                            />
-                            <button
-                                    type="button"
-                                    class="btn btn-outline-secondary"
-                                    id="togglePassword"
-                            >
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <input
-                                class="form-check-input"
-                                type="checkbox"
-                                id="rememberMe"
-                                name="remember-me"
-                        />
-                        <label class="form-check-label" for="rememberMe">
-                            Remember me
-                        </label>
-                    </div>
-
-                    <button type="submit" class="btn btn-login w-100 mb-3">Log in</button>
-
-                    <div class="text-center mt-3"  style="color: white;">
-                        <a
-                                th:href="@{/forgot-password}"
-                                class="text-decoration-none"
-                        >
-                            Forgot your password?
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="auth-card shadow-lg border-0" style="color: white;">
+<main>
+    <div class="auth-card">
         <div class="text-center mb-4">
-            <img src="/images/logo.png" alt="Logo" class="img-fluid" style="max-width: 150px; height: auto;">
+            <img src="/images/logo.png" alt="Logo" class="img-fluid" style="max-width: 120px;">
+            <h3 class="mt-3 text-dark" style="font-weight:600;">Login to your account</h3>
         </div>
-        <p class="text-muted" style="font-size: 0.9rem;" >
-            Don't have an account? <a th:href="@{/register}" class="text-decoration-none" style="color: white; font-weight: 500;">Sign up</a>
-        </p>
-        <p class="text-muted" style="font-size: 0.9rem;">
-            By logging in,
-            you agree to our <a th:href="@{/terms}" class="text-decoration-none"  style="color: white; font-weight: 500;">Terms of Service</a> and <a th:href="@{/privacy}" class="text-decoration-none" style="color: var(--gradient-start); font-weight: 500;">Privacy Policy</a>.
-        </p>
-        <!-- OAuth Buttons -->
-        <div class="d-grid gap-2 mt-4">
-            <a class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center gap-2"
-               href="/oauth2/authorization/google">
+
+        <div th:if="${param.error}" class="alert alert-danger">Invalid credentials.</div>
+        <div th:if="${param.logout}" class="alert alert-info">You have been logged out.</div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <form th:action="@{/login}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div class="mb-3 form-floating">
+                <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>
+                <label for="username">Username</label>
+            </div>
+            <div class="mb-3 form-floating position-relative">
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                <label for="password">Password</label>
+                <button type="button" class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2" id="togglePassword">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="rememberMe" name="remember-me">
+                <label class="form-check-label text-dark" for="rememberMe">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-login w-100 mb-3">Log in</button>
+        </form>
+
+        <div class="text-center mb-3">
+            <a th:href="@{/forgot-password}" class="text-decoration-none text-white">Forgot your password?</a>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a class="btn btn-outline-light d-flex align-items-center justify-content-center gap-2 mb-2" href="/oauth2/authorization/google">
                 <i class="fab fa-google"></i> Login with Google
             </a>
+            <a th:href="@{/register}" class="btn btn-outline-light d-block">Don't have an account? Register</a>
         </div>
-
-        <!-- Register Prompt -->
-        <p class="mt-4 mb-0 text-center">
-            Don't have an account?
-            <a href="/register" class="text-decoration-none" style="color: var(--gradient-start); font-weight: 500;">
-                Register
-            </a>
-        </p>
     </div>
+</main>
 
-</div>
 
-<!-- Footer -->
 <footer class="bg-light text-center text-muted py-3 shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
     <div>
         © 2025 Social Media Platform. All rights reserved.
@@ -390,7 +276,7 @@
     });
 </script>
 
-</body>
+
 <!-- Toast Container -->
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
     <div class="toast align-items-center text-bg-success border-0 show"
@@ -403,4 +289,5 @@
         </div>
     </div>
 </div>
+</body>
 </html>

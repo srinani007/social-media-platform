@@ -1,7 +1,6 @@
 package com.prash.social_media_platform.config;
 
 import com.prash.social_media_platform.security.CustomOAuth2UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -12,46 +11,49 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    @Lazy
-    private CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final UserDetailsService    userDetailsService;
+    private final Environment           env;
 
-    @Autowired
-    private UserDetailsService userDetailsService;  // your UserDetailsService implementation
-
-    @Autowired
-    private Environment env;
+    public SecurityConfig(@Lazy CustomOAuth2UserService customOAuth2UserService,
+                          UserDetailsService userDetailsService,
+                          Environment env) {
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.userDetailsService      = userDetailsService;
+        this.env                     = env;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Configure DAO-based authentication provider
     @Bean
     public DaoAuthenticationProvider daoAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
+        DaoAuthenticationProvider p = new DaoAuthenticationProvider();
+        p.setUserDetailsService(userDetailsService);
+        p.setPasswordEncoder(passwordEncoder());
+        return p;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // on prod, force HTTPS
         if (env.acceptsProfiles(Profiles.of("prod"))) {
-            http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
+            http.requiresChannel(c -> c.anyRequest().requiresSecure());
         }
 
         http
-                // register custom authentication provider
                 .authenticationProvider(daoAuthProvider())
 
                 .authorizeHttpRequests(auth -> auth
@@ -61,39 +63,51 @@ public class SecurityConfig {
                                 "/forgot-password", "/reset-password/**", "/h2-console/**"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/messages/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/messages/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/user/**").hasAnyRole("USER","ADMIN")
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
+
+                .formLogin(f -> f
                         .loginPage("/login")
-                        .defaultSuccessUrl("/redirect-dashboard", true)
+                        .defaultSuccessUrl("/user/dashboard", true)
                         .permitAll()
                 )
-                .oauth2Login(oauth -> oauth
+
+                .oauth2Login(o -> o
                         .loginPage("/login")
-                        .defaultSuccessUrl("/redirect-dashboard", true)
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
-                        )
+                        .defaultSuccessUrl("/user/dashboard", true)
+                        .userInfoEndpoint(u -> u.userService(customOAuth2UserService))
                 )
-                .logout(logout -> logout
+
+                .logout(l -> l
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
-                        .deleteCookies("JSESSIONID", "remember-me")
+                        .deleteCookies("JSESSIONID","remember-me")
                         .permitAll()
                 )
-                .rememberMe(rm -> rm
+
+                .rememberMe(r -> r
                         .key("aVerySecretKey")
-                        .tokenValiditySeconds(7 * 24 * 60 * 60)
+                        .tokenValiditySeconds(7*24*60*60)
                 )
-                .csrf(AbstractHttpConfigurer::disable);
+
+                // **Re-enable** CSRF via a cookie-based repo so your <meta> tags and JS work:
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                )
+        ;
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg)
+            throws Exception {
+        return cfg.getAuthenticationManager();
     }
 }

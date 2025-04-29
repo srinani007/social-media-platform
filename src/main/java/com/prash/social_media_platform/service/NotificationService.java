@@ -40,6 +40,15 @@ public class NotificationService {
                 .limit(10)
                 .toList();
     }
+    // in NotificationService.java
+    @Transactional
+    public void markRead(Long id) {
+        repo.findById(id).ifPresent(n -> {
+            n.setRead(true);
+            repo.save(n);
+        });
+    }
+
 
     // Full list for notifications page
     public List<Notification> findAll(String username) {
@@ -60,4 +69,10 @@ public class NotificationService {
             }
         }
     }
+    @Transactional
+    public void clearAll(String username) {
+        List<Notification> notifs = repo.findByUserUsernameOrderByTimestampDesc(username);
+        repo.deleteAll(notifs);  // or custom delete query
+    }
+
 }

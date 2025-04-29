@@ -37,4 +37,9 @@ public class RedirectController {
                 ? "redirect:/user/dashboard?pro=true"
                 : "redirect:/user/dashboard?pro=false";
     }
+    @GetMapping("/dashboard")
+    public String dashboardAlias() {
+        // forward or redirect to your real dashboard URL
+        return "redirect:/user/dashboard";
+    }
 }

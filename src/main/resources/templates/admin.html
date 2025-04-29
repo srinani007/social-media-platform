@@ -133,6 +133,49 @@
             .table-responsive {
                 padding: 0;
             }
+            .table-responsive table {
+                margin: 0;
+            }
+            .table-responsive thead th {
+                display: none;
+            }
+            .table-responsive tbody tr {
+                display: flex;
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .table-responsive tbody tr td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+            }
+            .table-responsive tbody tr td:nth-child(1) {
+                font-weight: bold;
+            }
+            .table-responsive tbody tr td:nth-child(2) {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+            .table-responsive tbody tr td:nth-child(3) {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+            .table-responsive tbody tr td:nth-child(4) {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+            .table-responsive tbody tr td:nth-child(5) {
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+            .table-responsive tbody tr td:nth-child(5) .action-buttons {
+                display: flex;
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
 
             .action-buttons {
                 flex-direction: column;
@@ -143,6 +186,24 @@
                 width: 100%;
                 font-size: 0.85rem;
                 padding: 0.35rem 0.5rem;
+            }
+            .btn-outline-info {
+                background-color: #17a2b8;
+                color: white;
+                border: none;
+                transition: background-color 0.3s ease;
+            }
+            .btn-outline-info:hover {
+                background-color: #138496;
+            }
+            .btn-delete {
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                transition: background-color 0.3s ease;
+            }
+            .btn-delete:hover {
+                background-color: #c82333;
             }
         }
 
