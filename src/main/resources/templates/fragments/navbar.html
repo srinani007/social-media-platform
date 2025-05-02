@@ -105,12 +105,26 @@
                     </div>
 
                     <!-- instead of <a th:href="@{/logout}">…</a>, use: -->
-                    <form th:action="@{/logout}" method="post" class="d-inline">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <form th:action="@{/logout}" method="post" class="d-inline" th:if="${#authorization.expression('isAuthenticated()')}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"  />
                         <button type="submit" class="btn btn-outline-light btn-sm">
                             <i class="fas fa-sign-out-alt me-1"></i> Logout
                         </button>
                     </form>
+
+                    <form th:action="@{/logout}" method="post" class="d-inline" th:if="${#authorization.expression('!isAuthenticated()')}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"  />
+                        <button type="submit" class="btn btn-outline-light btn-sm">
+                            <a class="btn t d-flex align-items-center justify-content-center  " href="/oauth2/authorization/google">
+                                <i class="fab fa-google me-1"></i> Login with Google
+                            </a>
+                        </button>
+                    </form>
+
+                    <div class="d-grid gap-2">
+
+
+                    </div>
                 </div>
             </div>
         </div>

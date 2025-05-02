@@ -41,8 +41,10 @@ public class UserService {
      * Throws if not found.
      */
     public User getByUsernameOrEmail(String identifier) {
-        return userRepository.findByUsernameOrEmailIgnoreCase(identifier, identifier)
-                .orElseThrow(() -> new RuntimeException("User not found: " + identifier));
+        return userRepository
+                .findByUsernameOrEmailIgnoreCase(identifier)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found: " + identifier));
     }
 
     /**

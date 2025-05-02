@@ -15,7 +15,7 @@ public class HomeController {
             return "redirect:/dashboard";
         }
         // not logged in → show login page
-        return "login";
+        return "index";
         // (or "index" if your login template is named index.html)
     }
 }

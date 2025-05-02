@@ -6,6 +6,9 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 @Entity @Table(name = "messages")
 @NoArgsConstructor @AllArgsConstructor @Builder
@@ -36,6 +39,59 @@ public class Message {
     private String email;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private boolean delivered;
+    private Date deliveredAt;
+
+    private boolean deletedBySender;
+    private boolean deletedByRecipient;
+
+    @ElementCollection
+    @CollectionTable(name = "message_reactions",
+            joinColumns = @JoinColumn(name = "message_id"))
+    @MapKeyColumn(name = "emoji")
+    @Column(name = "user_id")
+    private Map<String, Set<String>> reactions;
+
+    public Map<String, Set<String>> getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(Map<String, Set<String>> reactions) {
+        this.reactions = reactions;
+    }
+
+    public boolean isDelivered() {
+        return delivered;
+    }
+
+    public void setDelivered(boolean delivered) {
+        this.delivered = delivered;
+    }
+
+    public Date getDeliveredAt() {
+        return deliveredAt;
+    }
+
+    public void setDeliveredAt(Date deliveredAt) {
+        this.deliveredAt = deliveredAt;
+    }
+
+    public boolean isDeletedBySender() {
+        return deletedBySender;
+    }
+
+    public void setDeletedBySender(boolean deletedBySender) {
+        this.deletedBySender = deletedBySender;
+    }
+
+    public boolean isDeletedByRecipient() {
+        return deletedByRecipient;
+    }
+
+    public void setDeletedByRecipient(boolean deletedByRecipient) {
+        this.deletedByRecipient = deletedByRecipient;
+    }
 
     public Long getId() {
         return id;

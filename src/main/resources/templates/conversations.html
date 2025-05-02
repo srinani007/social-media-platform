@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-bs-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Conversations – SocialSphere</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* reuse the same CSS variables & utilities from message.html */
+        :root {
+          --bg-card: rgba(255,255,255,0.85);
+          --bg-card-dark: rgba(33,37,41,0.85);
+          --primary: #0d6efd;
+          --primary-light: #e7f1ff;
+          --text-muted: #6c757d;
+          --radius: 0.75rem;
+          --shadow: rgba(0,0,0,0.1) 0px 2px 8px;
+        }
+        @media (prefers-color-scheme: dark) {
+          :root { --bg-card: var(--bg-card-dark); }
+        }
+        .sidebar {
+          background: var(--bg-card);
+          backdrop-filter: blur(8px);
+          box-shadow: var(--shadow);
+        }
+        .search-bar {
+          display: flex; gap: .5rem;
+          padding: .75rem 1rem;
+          border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .search-bar input { border-radius: var(--radius); box-shadow: inset var(--shadow); }
+        .search-bar button { width: 3rem; border-radius: var(--radius); }
+
+        .list-group-item {
+          border:#0d6efd; border-radius: var(--radius);
+          margin: .25rem 1rem; padding: .75rem 1rem;
+          transition: background .2s, transform .1s;
+          position: relative;
+        }
+        .list-group-item:hover { background: gold; transform: translateY(-2px); }
+        .list-group-item.unread { background: var(--primary-light); }
+        .list-group-item.active { border-left: 4px solid var(--primary); }
+
+        .unread-badge {
+          position: absolute; right: 1.25rem; top: 50%;
+          transform: translateY(-50%);
+          background: var(--primary); color: #fff;
+          border-radius: 50%; width: 1.5rem; height: 1.5rem;
+          font-size: .75rem; line-height: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="container-fluid vh-100 p-0">
+    <div class="row h-100 gx-0">
+
+        <!-- DESKTOP: Conversation List -->
+        <aside class="col-md-4 d-none d-md-flex flex-column sidebar p-0">
+            <div class="search-bar">
+                <input id="search-desk" type="text" class="form-control" placeholder="Search…">
+                <button id="new-desk" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="new-list-desk" class="list-group d-none">
+                <a th:each="u : ${allUsers}"
+                   th:href="@{'/messages/' + ${u.username}}"
+                   class="list-group-item list-group-item-action"
+                   th:unless="${u.username == #authentication.name}"
+                   th:text="${u.fullName}">User Name</a>
+            </div>
+            <ul id="conv-desk" class="list-group list-group-flush flex-grow-1 overflow-auto">
+                <li th:each="conv : ${conversations}"
+                    class="list-group-item"
+                    th:classappend="(${conv.unreadCount > 0} ? ' unread' : '') +
+                              (${conv.username == selectedUsername} ? ' active' : '')">
+                    <a th:href="@{'/messages/' + ${conv.username}}"
+                       class="d-flex justify-content-between text-reset text-decoration-none">
+                        <div>
+                            <strong th:text="${conv.displayName}">Name</strong><br>
+                            <small class="text-muted" th:text="${conv.lastMessageSnippet}">Last snippet…</small>
+                        </div>
+                        <div class="text-end ms-2">
+                            <small class="text-muted mb-1"
+                                   th:text="${#temporals.format(conv.lastMessageTime,'h:mm a')}">4:21 PM</small>
+                            <span th:if="${conv.unreadCount > 0}"
+                                  class="unread-badge"
+                                  th:text="${conv.unreadCount}">3</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- DESKTOP: Placeholder -->
+        <section class="col-md-8 d-none d-md-flex align-items-center justify-content-center">
+            <div class="text-muted">Select a conversation to start chatting.</div>
+        </section>
+
+        <!-- MOBILE: Full-screen Conversation List -->
+        <div class="d-flex d-md-none flex-column vh-100 p-0">
+            <div class="search-bar">
+                <input id="search-mob" type="text" class="form-control" placeholder="Search…">
+                <button id="new-mob" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="new-list-mob" class="list-group d-none">
+                <a th:each="u : ${allUsers}"
+                   th:href="@{'/messages/' + ${u.username}}"
+                   class="list-group-item list-group-item-action"
+                   th:unless="${u.username == #authentication.name}"
+                   th:text="${u.fullName}">User Name</a>
+            </div>
+            <ul id="conv-mob" class="list-group list-group-flush flex-grow-1 overflow-auto">
+                <li th:each="conv : ${conversations}"
+                    class="list-group-item"
+                    th:classappend="(${conv.unreadCount > 0} ? ' unread' : '') +
+                              (${conv.username == selectedUsername} ? ' active' : '')">
+                    <a th:href="@{'/messages/' + ${conv.username}}"
+                       class="d-flex justify-content-between text-reset text-decoration-none">
+                        <div>
+                            <strong th:text="${conv.displayName}">Name</strong><br>
+                            <small class="text-muted" th:text="${conv.lastMessageSnippet}">Last snippet…</small>
+                        </div>
+                        <div class="text-end ms-2">
+                            <small class="text-muted mb-1"
+                                   th:text="${#temporals.format(conv.lastMessageTime,'h:mm a')}">4:21 PM</small>
+                            <span th:if="${conv.unreadCount > 0}"
+                                  class="unread-badge" th:text="${conv.unreadCount}">3</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<!-- Bootstrap JS (a bundle includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Toggle “new conversation” lists
+    document.getElementById('new-desk').onclick = () =>
+      document.getElementById('new-list-desk').classList.toggle('d-none');
+    document.getElementById('new-mob').onclick = () =>
+      document.getElementById('new-list-mob').classList.toggle('d-none');
+
+    // Live search filtering
+    function wireSearch(inputId, itemSelector) {
+      document.getElementById(inputId).addEventListener('input', e => {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll(itemSelector).forEach(el => {
+          el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+      });
+    }
+    wireSearch('search-desk', '#conv-desk li');
+    wireSearch('search-mob',  '#conv-mob li');
+</script>
+
+</body>
+</html>

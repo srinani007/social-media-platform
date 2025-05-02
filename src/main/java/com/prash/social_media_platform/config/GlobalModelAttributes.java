@@ -45,7 +45,7 @@ public class GlobalModelAttributes {
             return 0L;
         }
         String username = resolveUsername(auth);
-        return messageService.countUnreadMessages(username);
+        return messageService.unreadCount(username);
     }
 
     @ModelAttribute("notifications")
