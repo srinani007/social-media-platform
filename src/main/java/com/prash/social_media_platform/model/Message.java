@@ -40,7 +40,7 @@ public class Message {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    private boolean delivered;
+    @Column(name = "delivered_at")
     private Date deliveredAt;
 
     @Transient
@@ -63,13 +63,6 @@ public class Message {
         this.reactions = reactions;
     }
 
-    public boolean isDelivered() {
-        return delivered;
-    }
-
-    public void setDelivered(boolean delivered) {
-        this.delivered = delivered;
-    }
 
     public Date getDeliveredAt() {
         return deliveredAt;
