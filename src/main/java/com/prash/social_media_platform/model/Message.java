@@ -43,7 +43,9 @@ public class Message {
     private boolean delivered;
     private Date deliveredAt;
 
+    @Transient
     private boolean deletedBySender;
+    @Transient
     private boolean deletedByRecipient;
 
     @ElementCollection
