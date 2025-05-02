@@ -124,7 +124,7 @@ public class MessageService {
     @Transactional
     public void markDelivered(Long messageId) {
         repo.findById(messageId).ifPresent(m -> {
-            m.setDelivered(true);
+
             m.setDeliveredAt(new Date());
             repo.save(m);
         });
