@@ -1,5 +1,6 @@
 package com.prash.social_media_platform.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
     @Id
@@ -148,7 +150,7 @@ public class User {
     }
 
     public String getProfilePictureUrl() {
-        return profilePictureUrl;
+        return profilePictureUrl != null ? profilePictureUrl : "/images/default-avatar.png";
     }
 
     public void setProfilePictureUrl(String profilePictureUrl) {

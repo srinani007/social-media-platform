@@ -2,6 +2,7 @@ package com.prash.social_media_platform.service;
 
 import com.prash.social_media_platform.model.User;
 import com.prash.social_media_platform.repository.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,12 +41,14 @@ public class UserService {
      * Lookup by username OR email (case‑insensitive).
      * Throws if not found.
      */
+    @Cacheable("users")
     public User getByUsernameOrEmail(String identifier) {
+        System.out.println("Fetching user from DB: " + identifier);
         return userRepository
                 .findByUsernameOrEmailIgnoreCase(identifier)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found: " + identifier));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + identifier));
     }
+
 
     /**
      * Unified lookup for controllers:

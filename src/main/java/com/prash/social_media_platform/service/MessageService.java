@@ -8,6 +8,7 @@ import com.prash.social_media_platform.repository.MessageRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -20,18 +21,20 @@ public class MessageService {
         this.repo = repo;
     }
 
+
     public Message send(User sender, User recipient, String content) {
-        return send(sender, recipient, null, content);
+        Message message = new Message();
+        message.setSender(sender);
+        message.setRecipient(recipient);
+        message.setContent(content);
+        message.setSentAt(Instant.now()); // ✅ VERY IMPORTANT
+        message.setRead(false);
+        message.setDelivered(false);
+
+        return repo.save(message);
     }
 
-    public Message send(User sender, User recipient, String subject, String content) {
-        Message m = new Message();
-        m.setSender(sender);
-        m.setRecipient(recipient);
-        m.setSubject(subject);
-        m.setContent(content);
-        return repo.save(m);
-    }
+
 
     public List<ConversationDto> listConversations(String me) {
         List<Message> all = repo.findBySenderUsernameOrRecipientUsernameOrderBySentAtDesc(me, me);
@@ -52,18 +55,27 @@ public class MessageService {
                 long unread = repo.countBySenderUsernameAndRecipientUsernameAndReadFalse(
                         partner.getUsername(), me);
 
-                // Mark as read if we're the sender or if there are no unread messages
                 boolean isRead = m.getSender().getUsername().equals(me) || (unread == 0);
 
-                map.put(key, new ConversationDto(
+                // Make sure to use partner's profile picture URL
+                String profilePicUrl = partner.getProfilePictureUrl() != null ?
+                        partner.getProfilePictureUrl() :
+                        "/images/default-avatar.png";
+
+                ConversationDto dto = new ConversationDto(
                         key,
                         partner.getFullName(),
-                        partner.getProfilePictureUrl(),
+                        profilePicUrl,  // This sets avatarUrl in constructor
                         lastTime,
                         snippet,
                         unread,
                         isRead
-                ));
+                );
+
+                // Also set profilePictureUrl explicitly
+                dto.setProfilePictureUrl(profilePicUrl);
+
+                map.put(key, dto);
             }
         }
         return new ArrayList<>(map.values());
@@ -77,13 +89,14 @@ public class MessageService {
 
     /** Legacy inbox by recipient only */
     public List<Message> inbox(String username) {
-        return repo.findByRecipientUsernameOrderBySentAtDesc(username);
+        return repo.findBySenderUsernameOrRecipientUsernameOrderBySentAtDesc(username);
     }
 
     public int unreadCount(String username) {
         return repo.countByRecipientUsernameAndReadFalse(username);
     }
 
+    @Transactional
     public void markRead(Long messageId) {
         repo.findById(messageId).ifPresent(m -> {
             m.setRead(true);
@@ -91,31 +104,30 @@ public class MessageService {
         });
     }
 
+
     /**
      * Get new messages in a conversation since the last seen message ID
      */
     public List<Message> getNewMessages(String currentUser, String otherUser, Long lastMessageId) {
-        if (lastMessageId == null || lastMessageId == 0) {
-            // If no last message ID provided, return an empty list
+        if (lastMessageId == null) {
             return Collections.emptyList();
         }
 
-        // Verify the last message exists and belongs to this conversation
         Optional<Message> lastMessage = repo.findById(lastMessageId);
-        if (lastMessage.isEmpty() ||
-                !(lastMessage.get().getSender().getUsername().equals(currentUser) ||
-                        !(lastMessage.get().getRecipient().getUsername().equals(otherUser)) &&
-                                !(lastMessage.get().getSender().getUsername().equals(otherUser) ||
-                                        !(lastMessage.get().getRecipient().getUsername().equals(currentUser))))) {
-            throw new IllegalArgumentException("Invalid last message ID for this conversation");
+        if (lastMessage.isEmpty()) {
+            throw new IllegalArgumentException("Last message not found");
         }
 
-        // Get messages sent after the last message and in this conversation
-        return repo.findNewMessagesInConversation(
-                currentUser,
-                otherUser,
-                lastMessage.get().getSentAt()
-        );
+        Message m = lastMessage.get();
+        boolean isPartOfConversation =
+                (m.getSender().getUsername().equals(currentUser) && m.getRecipient().getUsername().equals(otherUser)) ||
+                        (m.getSender().getUsername().equals(otherUser) && m.getRecipient().getUsername().equals(currentUser));
+
+        if (!isPartOfConversation) {
+            throw new IllegalArgumentException("Message does not belong to this conversation");
+        }
+
+        return repo.findNewMessagesInConversation(currentUser, otherUser, m.getSentAt());
     }
 
     /**
@@ -183,5 +195,37 @@ public class MessageService {
     public void markConversationAsRead(String me, String other) {
         repo.markConversationAsRead(me, other);
     }
+
+    /**
+     * Remove a reaction from a message
+     */
+    @Transactional
+    public void removeReaction(Long messageId, String name, String emoji) {
+        repo.findById(messageId).ifPresent(m -> {
+            Map<String, Set<String>> reactions = m.getReactions();
+            if (reactions != null) {
+                Set<String> users = reactions.get(emoji);
+                if (users != null) {
+                    users.remove(name);
+                    if (users.isEmpty()) {
+                        reactions.remove(emoji);
+                    }
+                }
+                m.setReactions(reactions);
+                repo.save(m);
+            }
+        });
+    }
+
+    /**
+     * Mark all messages in a conversation as read
+     */
+
+    @Transactional
+    public void markAllRead(String name, String otherUsername) {
+        repo.markConversationAsRead(name, otherUsername);
+        repo.markConversationAsRead(otherUsername, name);
+    }
+
 
 }

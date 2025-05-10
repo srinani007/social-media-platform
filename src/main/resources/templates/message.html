@@ -4,328 +4,1150 @@
     <meta charset="UTF-8">
     <title>Messages – SocialSphere</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Private messaging platform">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="current-user" th:content="${#authentication.name}" id="currentUser"/>
 
     <!-- Bootstrap & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.css" rel="stylesheet">
 
     <style>
         :root {
-          --footer-height: 3rem;
-          --bg-card: rgba(255,255,255,0.85);
-          --bg-card-dark: rgba(33,37,41,0.85);
+          --gradient-start: #1e3c72;
+          --bg-card: rgba(255,255,255,0.95);
+          --bg-card-dark: rgba(2, 78, 154, 0.95);
           --primary: #0d6efd;
           --primary-light: #e7f1ff;
           --text-dark: #212529;
           --text-light: #f8f9fa;
           --text-muted: #6c757d;
           --radius: 0.75rem;
-          --shadow: rgba(0,0,0,0.1) 0px 2px 8px;
+          --shadow: rgba(15, 43, 183, 0.333) 0px 2px 8px;
+          --active-conversation: #f8f9fa;
+          --error-red: #dc3545;
+          --success-green: #28a745;
         }
         @media (prefers-color-scheme: dark) {
           :root {
             --bg-card: var(--bg-card-dark);
             --text-muted: #adb5bd;
+            --active-conversation: #0765b7;
           }
         }
+
+        /* Base layout */
+        .messages-container {
+          height: calc(100vh - 56px); /* Subtract navbar height */
+        }
+
         /* Sidebar & search */
-        .sidebar, .mobile-sidebar {
+        .sidebar, .mobile-pane {
           backdrop-filter: blur(8px);
         }
+
         .search-bar {
           display: flex;
           gap: .5rem;
           padding: .75rem 1rem;
           border-bottom: 1px solid rgba(0,0,0,0.05);
+          background-color: var(--bg-card);
+          position: sticky;
+          top: 0;
+          z-index: 10;
         }
-        .search-bar input {
+
+        .search-bar input, .form-control {
           border-radius: var(--radius);
           box-shadow: inset var(--shadow);
         }
+
         .search-bar button {
           width: 3rem;
           border-radius: var(--radius);
         }
-        .form-control {
-          display: block;
-          border-radius: var(--radius);
-          box-shadow: inset var(--shadow);
-        }
+
         /* Conversation items */
+        .conversation-list {
+          overflow-y: auto;
+          height: calc(100% - 60px); /* Subtract search bar height */
+        }
+
         .list-group-item {
-          border:#fd0df9;
-          border-radius: var(--radius);
-          margin: .25rem 1rem;
+          border: 1px solid transparent;
+          border-radius: 0;
+          margin: 0;
           padding: .75rem 1rem;
-          transition: background .2s, transform .1s;
+          transition: background .2s;
           position: relative;
+          border-bottom: 1px solid rgba(21, 101, 221, 0.586);
         }
-        .list-group-item:hover { background:gold; transform: translateY(-2px); }
-        .list-group-item.unread { background: var(--primary-light); }
-        .list-group-item.active { border-left: 4px solid var(--primary); }
+
+        .list-group-item:hover {
+          background: rgba(219, 147, 4, 0.945);
+        }
+
+        .list-group-item.active {
+          background: var(--active-conversation);
+          border-left: none;
+        }
+
+        .list-group-item.unread {
+          background: rgba(5, 89, 216, 0.738);
+        }
+
         .unread-badge {
-          position: absolute; right: 1.25rem; top: 50%;
+          position: absolute;
+          right: 1.25rem;
+          top: 50%;
           transform: translateY(-50%);
-          background: var(--primary); color: #fff;
-          border-radius: 50%; width: 1.5rem; height: 1.5rem;
-          font-size: .75rem; line-height: 1.5rem;
+          background: var(--primary);
+          color: #fff;
+          border-radius: 50%;
+          width: 1.25rem;
+          height: 1.25rem;
+          font-size: .65rem;
+          line-height: 1.25rem;
+          text-align: center;
         }
+
         /* Chat pane */
         .chat-pane {
-          display: flex; flex-direction: column;
-          box-shadow: var(--shadow);
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          overflow: hidden;
         }
+
         .chat-header {
-          position: sticky; top: 0; z-index: 10;
-          display: flex; align-items: center; gap: .75rem;
-          padding: .75rem 1rem; border-bottom: 1px solid rgba(0,0,0,0.05);
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          gap: .75rem;
+          padding: .75rem;
+          border-bottom: 1px solid rgba(6, 64, 255, 0.481);
+          background-color: var(--bg-card);
         }
+
         .chat-messages {
-          flex: 1; overflow-y: auto; padding: 1rem;
-          /* add extra bottom padding = footer + input height (~3rem) */
-          padding-bottom: calc(var(--footer-height) + 3rem);
+          flex: 1;
+          overflow-y: auto;
+          padding: 1rem;
+          scroll-behavior: smooth;
         }
+
+        .chat-header .user-info {
+          display: flex;
+          align-items: center;
+          gap: .75rem;
+        }
+
         .msg {
-          display: inline-block; max-width: 75%;
-          padding: .75rem 1rem; margin-bottom: .75rem;
-          border-radius: var(--radius); box-shadow: var(--shadow);
+          display: inline-block;
+          max-width: 70%;
+          padding: .75rem 1rem;
+          margin-bottom: .75rem;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
           line-height: 1.4;
+          word-break: break-word;
+          position: relative;
+          transition: transform 0.2s, opacity 0.2s;
         }
+
         .msg.sent {
           background: var(--primary);
           color: #fff;
           margin-left: auto;
+          border-bottom-right-radius: 0.25rem;
         }
+
         .msg.received {
+          background: #f1f1f1;
           color: var(--text-dark);
           margin-right: auto;
-          border: 1px solid rgba(0,0,0,0.1);
+          border-bottom-left-radius: 0.25rem;
         }
-        /* stick the input right above the footer */
-        .chat-input {
-          position: sticky;
-          bottom: var(--footer-height);
-          z-index: 10;
-          background: var(--bg-card);
-          padding: .75rem 1rem;
-          border-top: 1px solid rgba(0,0,0,0.05);
+
+        .msg-status {
+          position: absolute;
+          right: 0.5rem;
+          bottom: 0.25rem;
+          font-size: 0.75rem;
+        }
+
+        .msg-actions {
+          position: absolute;
+          top: 0.25rem;
+          right: 0.5rem;
+          opacity: 0;
+          transition: opacity 0.2s;
+        }
+
+        .msg:hover .msg-actions {
+          opacity: 1;
+        }
+
+        .msg-actions button {
+          background: none;
+          border: none;
+          color: inherit;
+          padding: 0.25rem;
+          cursor: pointer;
+        }
+
+        .reactions-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.25rem;
+          margin-top: 0.5rem;
+        }
+
+        .reaction-badge {
+          background: rgba(0, 0, 0, 0.1);
+          border-radius: 1rem;
+          padding: 0.1rem 0.4rem;
+          font-size: 0.8rem;
           display: flex;
           align-items: center;
-          gap: .5rem;
+          gap: 0.25rem;
+          cursor: pointer;
+        }
+
+        .reaction-badge:hover {
+          background: rgba(0, 0, 0, 0.2);
+        }
+
+        .reaction-picker {
+          position: absolute;
+          bottom: 100%;
+          right: 0;
+          z-index: 100;
+        }
+
+        /* sticky input */
+        .chat-input-container {
+          position: sticky;
+          bottom: 0;
+          background-color: var(--bg-card);
+          padding: .75rem;
+          border-top: 1px solid rgba(15, 92, 234, 0.589);
+        }
+
+        .typing-indicator {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          padding: 0 1rem 0.5rem;
+          height: 1.5rem;
+        }
+
+        /* Error/Success messages */
+        .alert-message {
+          position: fixed;
+          bottom: 1rem;
+          right: 1rem;
+          z-index: 2000;
+          max-width: 300px;
+          display: none;
+        }
+
+        /* mobile */
+        .mobile-pane {
+          position: relative;
+          height: 100%;
+        }
+
+        #back-btn {
+          font-size:1.25rem;
+          line-height:1;
+          color: var(--text-dark);
+        }
+
+        /* Empty state */
+        .empty-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          text-align: center;
+          padding: 2rem;
+          color: var(--text-muted);
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+          display: none;
+          text-align: center;
+          padding: 1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+          .messages-container {
+            height: calc(100vh - 56px);
+          }
+
+          .chat-pane {
+            border-left: none;
+          }
+
+          .msg {
+            max-width: 80%;
+          }
+        }
+
+        /* Animation for new messages */
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .new-message {
+          animation: fadeIn 0.3s ease-out;
         }
     </style>
 </head>
-<body>
+<body th:attr="data-current-user=${#authentication.name}">
 
 <!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div class="container-fluid vh-100 p-0">
+<!-- Alert Messages -->
+<div id="alertMessage" class="alert alert-danger alert-message" role="alert">
+    <span id="alertText"></span>
+    <button type="button" class="btn-close" onclick="hideAlert()"></button>
+</div>
+
+<div class="container-fluid messages-container p-0">
     <div class="row h-100 gx-0">
 
-        <!-- DESKTOP SIDEBAR -->
-        <aside class="col-md-2 d-none d-md-flex flex-column sidebar p-0">
+        <!-- DESKTOP SIDEBAR - Always visible on desktop -->
+        <aside class="col-md-4 col-lg-3 d-none d-md-flex flex-column sidebar p-0 h-100">
             <div class="search-bar">
-                <input id="search-desk" type="text" class="form-control" placeholder="Search…">
-                <button id="new-desk" class="btn btn-primary"><i class="fas fa-plus"></i></button>
+                <input id="search-desk" type="text" class="form-control" placeholder="Search messages..." aria-label="Search messages">
+                <button id="new-desk" class="btn btn-outline-primary" aria-label="New message"><i class="fas fa-pen-to-square"></i></button>
             </div>
-            <div id="new-list-desk" class="list-group d-none">
+            <div id="new-list-desk" class="list-group d-none overflow-auto">
                 <a th:each="u : ${allUsers}"
                    th:href="@{'/messages/' + ${u.username}}"
                    class="list-group-item list-group-item-action"
-                   th:unless="${u.username == #authentication.name}">
-                    <span th:text="${u.fullName}">Name</span>
-                </a>
+                   th:unless="${u.username == #authentication.name}"
+                   th:text="${u.fullName}"
+                   aria-label="Start chat with ${u.fullName}">Name</a>
             </div>
-            <ul id="conv-desk" class="list-group list-group-flush flex-grow-1 overflow-auto">
-                <li th:each="conv : ${conversations}"
-                    class="list-group-item"
-                    th:classappend="(${conv.unreadCount > 0} ? ' unread' : '') +
-                              (${conv.username == selectedUsername} ? ' active' : '')">
-                    <a th:href="@{'/messages/' + ${conv.username}}"
-                       class="d-flex justify-content-between text-reset text-decoration-none">
-                        <div>
-                            <strong th:text="${conv.displayName}">Name</strong><br>
-                            <small class="text-muted" th:text="${conv.lastMessageSnippet}">Snippet…</small>
-                        </div>
-                        <div class="text-end ms-2">
-                            <small class="text-muted mb-1"
-                                   th:text="${#temporals.format(conv.lastMessageTime,'h:mm a')}">4:21 PM</small>
-                            <span th:if="${conv.unreadCount > 0}"
-                                  class="unread-badge"
-                                  th:text="${conv.unreadCount}">3</span>
-                        </div>
-                    </a>
-                </li>
-            </ul>
-        </aside>
-
-        <!-- DESKTOP CHAT -->
-        <section class="col-md d-none d-md-flex flex-column chat-pane p-0">
-            <div th:if="${selectedUsername == null}"
-                 class="h-100 d-flex justify-content-center align-items-center text-muted">
-                Select a conversation on the left.
-            </div>
-            <div th:if="${selectedUsername != null}" class="h-100 d-flex flex-column">
-                <div class="chat-header">
-                    <img th:src="${otherUser.profilePictureUrl ?: '/images/default-avatar.png'}"
-                         class="rounded-circle" width="40" height="40" alt="avatar">
-                    <div>
-                        <strong th:text="${otherUser.fullName}">Full Name</strong><br>
-                        <small class="text-muted" th:text="'@' + ${otherUser.username}">username</small>
-                    </div>
-                </div>
-                <div id="messages" class="chat-messages">
-                    <div th:each="msg : ${messages}"
-                         class="d-flex mb-3"
-                         th:classappend="${msg.sender.username == #authentication.name ? 'justify-content-end' : 'justify-content-start'}">
-                        <div class="msg"
-                             th:classappend="${msg.sender.username == #authentication.name ? 'sent' : 'received'}">
-                            <div th:text="${msg.content}">Content</div>
-                            <div class="text-end text-muted small mt-1"
-                                 th:text="${#temporals.format(msg.sentAt,'h:mm a')}">12:00 PM</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- send form (desktop + mobile share same markup) -->
-                <form th:action="@{/messages/send}" method="post" class="chat-input">
-                    <!-- CSRF token for Spring Security -->
-                    <input type="hidden"
-                           th:name="${_csrf.parameterName}"
-                           th:value="${_csrf.token}" />
-                    <!-- recipient & content -->
-                    <input type="hidden" name="recipient" th:value="${selectedUsername}" />
-                    <input name="content" class="form-control me-2"
-                           placeholder="Type a message…" required />
-                    <button class="btn btn-primary">Send</button>
-                </form>
-            </div>
-        </section>
-
-        <!-- MOBILE LAYOUT -->
-        <div class="d-flex d-md-none flex-column vh-100 mobile-pane p-0">
-
-            <!-- LIST VIEW: always in the DOM, just hidden when a user is selected -->
-            <div id="list-pane"
-                 class="flex-grow-1 d-flex flex-column"
-                 th:classappend="${selectedUsername} != null ? ' d-none' : ''">
-                <!-- your existing search bar + new-chat -->
-                <div class="search-bar">
-                    <input id="search-mob" type="text" class="form-control" placeholder="Search…">
-                    <button id="new-mob" class="btn btn-primary"><i class="fas fa-plus"></i></button>
-                </div>
-                <div id="new-list-mob" class="list-group d-none">
-                    <a th:each="u : ${allUsers}"
-                       th:href="@{'/messages/' + ${u.username}}"
-                       class="list-group-item list-group-item-action"
-                       th:unless="${u.username == #authentication.name}">
-                        <span th:text="${u.username}">Name</span>
-                    </a>
-                </div>
-                <ul id="conv-mob" class="list-group list-group-flush flex-grow-1 overflow-auto">
+            <div class="conversation-list">
+                <ul id="conv-desk" class="list-group">
                     <li th:each="conv : ${conversations}"
                         class="list-group-item"
-                        th:classappend="(${conv.unreadCount} > 0 ? ' unread' : '')
-                            + (${conv.username} == ${selectedUsername} ? ' active' : '')">
+                        th:classappend="(${conv.unreadCount > 0} ? ' unread' : '') +
+                             (${conv.username == selectedUsername} ? ' active' : '')">
                         <a th:href="@{'/messages/' + ${conv.username}}"
-                           class="d-flex justify-content-between text-reset text-decoration-none">
-                            <div>
-                                <strong th:text="${conv.displayName}">Name</strong><br>
-                                <small class="text-muted" th:text="${conv.lastMessageSnippet}">Snippet…</small>
+                           class="d-flex justify-content-between text-reset text-decoration-none"
+                           aria-label="Conversation with ${conv.displayName}">
+                            <div class="d-flex align-items-center">
+                                <img th:src="${conv.profilePictureUrl ?: '/images/default-avatar.png'}"
+                                     class="rounded-circle me-2" width="40" height="40" alt="Profile picture of ${conv.displayName}">
+                                <div>
+                                    <strong th:text="${conv.displayName}">Name</strong><br>
+                                    <small class="text-muted" th:text="${conv.lastMessageSnippet}">Snippet…</small>
+                                </div>
                             </div>
-                            <div class="text-end ms-2">
-                                <small class="text-muted mb-1"
-                                       th:text="${#temporals.format(conv.lastMessageTime,'h:mm a')}">3:45 PM</small>
+                            <div class="text-end ms-2 d-flex flex-column">
+                                <small class="text-muted"
+                                       th:text="${#temporals.format(conv.lastMessageTime,'h:mm a')}">4:21 PM</small>
                                 <span th:if="${conv.unreadCount > 0}"
-                                      class="unread-badge"
-                                      th:text="${conv.unreadCount}">3</span>
+                                      class="unread-badge align-self-end" th:text="${conv.unreadCount}">3</span>
                             </div>
                         </a>
                     </li>
                 </ul>
             </div>
+        </aside>
 
-            <!-- CHAT VIEW: also always in the DOM, hidden when no user selected -->
-            <div id="chat-pane"
-                 class="flex-grow-1 d-flex flex-column"
-                 th:classappend="${selectedUsername} == null ? ' d-none' : ''">
+        <!-- DESKTOP CHAT - Always visible but shows content only when selected -->
+        <section class="col-md-8 col-lg-9 d-none d-md-flex flex-column chat-pane p-0">
+            <!-- Empty state when no conversation selected -->
+            <div th:if="${selectedUsername == null}" class="empty-state h-100">
+                <i class="far fa-comments fa-4x mb-3" aria-hidden="true"></i>
+                <h4>Your messages</h4>
+                <p class="mb-4">Send private messages to your friends</p>
+                <button id="new-desk-empty" class="btn btn-primary">Send message</button>
+            </div>
+
+            <!-- Chat content when conversation is selected -->
+            <div th:if="${selectedUsername != null}" class="h-100 d-flex flex-column">
                 <div class="chat-header">
-                    <!-- BUTTON instead of a link, so we toggle in-page -->
-                    <button id="back-btn" class="btn btn-link pe-2">←</button>
-                    <img th:src="${otherUser.profilePictureUrl ?: '/images/default-avatar.png'}"
-                         class="rounded-circle" width="40" height="40" alt="avatar">
-                    <div>
-                        <strong th:text="${otherUser.fullName}">Full Name</strong><br>
-                        <small class="text-muted" th:text="'@' + ${otherUser.username}">username</small>
+                    <img th:src="${otherUser?.profilePictureUrl ?: '/images/default-avatar.png'}"
+                         class="rounded-circle me-2" width="40" height="40" alt="Profile picture of ${otherUser?.fullName}">
+                    <div class="flex-grow-1">
+                        <strong th:text="${otherUser?.fullName ?: 'username'}">Full Name</strong><br>
+                        <small class="text-muted"
+                               th:text="${otherUser?.username != null ? 'Active now' : ''}">Active now</small>
                     </div>
+                    <button class="btn btn-link text-dark" aria-label="More options"><i class="fas fa-ellipsis"></i></button>
                 </div>
-                <div id="mob-messages" class="chat-messages">
+
+                <div id="typingIndicator" class="typing-indicator" style="display: none;">
+                    <span id="typingText"></span>
+                </div>
+
+                <div id="messages" class="chat-messages">
+                    <div id="loadingSpinner" class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
                     <div th:each="msg : ${messages}"
-                         class="d-flex mb-3"
+                         class="d-flex mb-3 message-container"
                          th:classappend="${msg.sender.username == #authentication.name ? 'justify-content-end' : 'justify-content-start'}">
                         <div class="msg"
                              th:classappend="${msg.sender.username == #authentication.name ? 'sent' : 'received'}">
+                            <div class="msg-actions">
+                                <button class="react-btn" th:attr="data-messageid=${msg.id}" aria-label="Add reaction">
+                                    <i class="far fa-smile"></i>
+                                </button>
+                                <button class="delete-btn" th:attr="data-messageid=${msg.id}" aria-label="Delete message">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </div>
                             <div th:text="${msg.content}">Content</div>
-                            <div class="text-end text-muted small mt-1"
-                                 th:text="${#temporals.format(msg.sentAt,'h:mm a')}">12:00 PM</div>
+                            <div class="reactions-container" th:if="${msg.reactions != null and not msg.reactions.isEmpty()}">
+                                <span th:each="entry : ${msg.reactions}" class="reaction-badge" th:attr="data-emoji=${entry.key}, data-messageid=${msg.id}">
+                                    <span th:text="${entry.key}"></span>
+                                    <small th:text="${entry.value.size()}"></small>
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end mt-1">
+                                <div class="text-start small"
+                                     th:classappend="${msg.sender.username == #authentication.name ? 'text-white-50' : 'text-muted'}"
+                                     th:text="${#temporals.format(msg.sentAt,'h:mm a')}">12:00 PM</div>
+                                <div class="msg-status" th:if="${msg.sender.username == #authentication.name}">
+                                    <i th:if="${msg.read}" class="fas fa-check-double text-info" aria-label="Read"></i>
+                                    <i th:elseif="${msg.delivered}" class="fas fa-check text-muted" aria-label="Delivered"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <form th:action="@{/messages/send}" method="post" class="chat-input d-flex">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <input type="hidden" name="recipient" th:value="${selectedUsername}" />
-                    <input name="content" class="form-control me-2" placeholder="Type a message…" required />
-                    <button class="btn btn-primary">Send</button>
-                </form>
+
+                <div class="chat-input-container">
+                    <form id="messageForm" th:action="@{/messages/send}" method="post" class="chat-input">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="recipient" th:value="${selectedUsername}" />
+                        <div class="input-group">
+                            <input name="content" class="form-control me-2" placeholder="Message..." required
+                                   aria-label="Type your message" id="messageInput">
+                            <button type="button" class="btn btn-link text-primary" id="emojiToggle" aria-label="Emoji picker">
+                                <i class="far fa-smile"></i>
+                            </button>
+                            <button type="submit" class="btn btn-link text-primary" aria-label="Send message">
+                                <i class="far fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <emoji-picker class="d-none" id="emojiPicker"></emoji-picker>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- MOBILE LAYOUT -->
+        <div class="d-flex d-md-none flex-column mobile-pane h-100">
+            <!-- LIST VIEW - Default view on mobile -->
+            <div id="list-pane" class="flex-grow-1 d-flex flex-column"
+                 th:classappend="${selectedUsername != null} ? ' d-none' : ''">
+                <div class="search-bar">
+                    <input id="search-mob" type="text" class="form-control" placeholder="Search messages..." aria-label="Search messages">
+                    <button id="new-mob" class="btn btn-outline-primary" aria-label="New message"><i class="fas fa-pen-to-square"></i></button>
+                </div>
+                <div id="new-list-mob" class="list-group overflow-auto"
+                     th:classappend="${selectedUsername != null} ? ' d-none' : ''">
+                    <a th:each="u : ${allUsers}"
+                       th:href="@{'/messages/' + ${u.username}}"
+                       class="list-group-item list-group-item-action"
+                       th:unless="${u.username == #authentication.name}"
+                       th:text="${u.fullName}"
+                       aria-label="Start chat with ${u.fullName}">Name</a>
+                </div>
+                <div class="conversation-list">
+                    <ul id="conv-mob" class="list-group">
+                        <li th:each="conv : ${conversations}"
+                            class="list-group-item"
+                            th:classappend="(${conv.unreadCount > 0} ? ' unread' : '') +
+                                       (${conv.username == selectedUsername} ? ' active' : '')">
+                            <a th:href="@{'/messages/' + ${conv.username}}"
+                               class="d-flex justify-content-between text-reset text-decoration-none"
+                               aria-label="Conversation with ${conv.displayName}">
+                                <div class="d-flex align-items-center">
+                                    <img th:src="${conv.profilePictureUrl ?: '/images/default-avatar.png'}"
+                                         class="rounded-circle me-2" width="40" height="40" alt="Profile picture of ${conv.displayName}">
+                                    <div>
+                                        <strong th:text="${conv.displayName}">Name</strong><br>
+                                        <small class="text-muted" th:text="${conv.lastMessageSnippet}">Snippet…</small>
+                                    </div>
+                                </div>
+                                <div class="text-end ms-2 d-flex flex-column">
+                                    <small class="text-muted"
+                                           th:text="${#temporals.format(conv.lastMessageTime,'h:mm a')}">3:45 PM</small>
+                                    <span th:if="${conv.unreadCount > 0}"
+                                          class="unread-badge align-self-end" th:text="${conv.unreadCount}">3</span>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CHAT VIEW - Only shown when conversation is selected on mobile -->
+            <div id="chat-pane" class="flex-grow-1 d-flex flex-column"
+                 th:classappend="${selectedUsername == null} ? ' d-none' : ''">
+                <div class="chat-header">
+                    <a th:href="@{/messages}" id="back-btn" class="btn btn-link pe-2" aria-label="Back to conversations"><i class="fas fa-arrow-left"></i></a>
+                    <img th:src="${otherUser?.profilePictureUrl ?: '/images/default-avatar.png'}"
+                         class="rounded-circle me-2" width="40" height="40" alt="Profile picture of ${otherUser?.fullName}">
+                    <div class="flex-grow-1">
+                        <strong th:text="${otherUser?.fullName ?: 'username'}">Full Name</strong><br>
+                        <small class="text-muted"
+                               th:text="${otherUser?.username != null ? 'Active now' : ''}">Active now</small>
+                    </div>
+                    <button class="btn btn-link text-dark" aria-label="More options"><i class="fas fa-ellipsis"></i></button>
+                </div>
+
+                <div id="mobileTypingIndicator" class="typing-indicator" style="display: none;">
+                    <span id="mobileTypingText"></span>
+                </div>
+
+                <div id="mob-messages" class="chat-messages">
+                    <div id="mobileLoadingSpinner" class="loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div th:each="msg : ${messages}"
+                         class="d-flex mb-3 message-container"
+                         th:classappend="${msg.sender.username == #authentication.name ? 'justify-content-end' : 'justify-content-start'}">
+                        <div class="msg"
+                             th:classappend="${msg.sender.username == #authentication.name ? 'sent' : 'received'}">
+                            <div class="msg-actions">
+                                <button class="react-btn" th:attr="data-messageid=${msg.id}" aria-label="Add reaction">
+                                    <i class="far fa-smile"></i>
+                                </button>
+                                <button class="delete-btn" th:attr="data-messageid=${msg.id}" aria-label="Delete message">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </div>
+                            <div th:text="${msg.content}">Content</div>
+                            <div class="reactions-container"  th:if="${msg.reactions != null and not msg.reactions.isEmpty()}">
+                                <span th:each="entry : ${msg.reactions}" class="reaction-badge"
+                                      th:attr="data-emoji=${entry.key}, data-messageid=${msg.id}">
+                                    <span th:text="${entry.key}"></span>
+                                    <small th:text="${entry.value.size()}"></small>
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end mt-1">
+                                <div class="text-start small"
+                                     th:classappend="${msg.sender.username == #authentication.name ? 'text-white-50' : 'text-muted'}"
+                                     th:text="${#temporals.format(msg.sentAt,'h:mm a')}">12:00 PM</div>
+                                <div class="msg-status" th:if="${msg.sender.username == #authentication.name}">
+                                    <i th:if="${msg.read}" class="fas fa-check-double text-info" aria-label="Read"></i>
+                                    <i th:elseif="${msg.delivered}" class="fas fa-check text-muted" aria-label="Delivered"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <form id="mobileMessageForm" th:action="@{/messages/send}" method="post" class="chat-input">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="recipient" th:value="${selectedUsername}" />
+                        <div class="input-group">
+                            <input name="content" class="form-control me-2" placeholder="Message..." required
+                                   aria-label="Type your message" id="mobileMessageInput">
+                            <button type="button" class="btn btn-link text-primary" id="mobileEmojiToggle" aria-label="Emoji picker">
+                                <i class="far fa-smile"></i>
+                            </button>
+                            <button type="submit" class="btn btn-link text-primary" aria-label="Send message">
+                                <i class="far fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <emoji-picker class="d-none" id="mobileEmojiPicker"></emoji-picker>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Message Context Menu (for delete confirmation) -->
+<div id="messageContextMenu" class="dropdown-menu">
+    <button class="dropdown-item confirm-delete" type="button">Delete Message</button>
+    <button class="dropdown-item cancel-delete" type="button">Cancel</button>
+</div>
+<!-- Scripts -->
 <script>
-    // Toggle new-chat dropdowns
-    document.getElementById('new-desk').addEventListener('click', () =>
-      document.getElementById('new-list-desk').classList.toggle('d-none')
-    );
-    document.getElementById('new-mob').addEventListener('click', () =>
-      document.getElementById('new-list-mob').classList.toggle('d-none')
-    );
+    document.addEventListener('DOMContentLoaded', function() {
+    // Common elements
+    const alertMessage = document.getElementById('alertMessage');
+    const alertText = document.getElementById('alertText');
+    const messageForms = document.querySelectorAll('.chat-input');
+    const messageInputs = document.querySelectorAll('input[name="content"]');
+    const emojiToggles = document.querySelectorAll('[id$="EmojiToggle"]');
+    const emojiPickers = document.querySelectorAll('emoji-picker');
+    const backBtn = document.getElementById('back-btn');
+    const newMessageButtons = document.querySelectorAll('[id^="new-"]');
+    const newMessageLists = document.querySelectorAll('[id^="new-list-"]');
+    const searchInputs = document.querySelectorAll('[id^="search-"]');
+    const conversationLists = document.querySelectorAll('[id^="conv-"]');
 
-    // Simple search wiring
-    function wireSearch(inputId, listSelector) {
-      document.getElementById(inputId).addEventListener('input', e => {
-        const q = e.target.value.toLowerCase();
-        document.querySelectorAll(listSelector).forEach(li => {
-          li.style.display = li.textContent.toLowerCase().includes(q) ? '' : 'none';
+    // WebSocket setup
+    let stompClient = null;
+    const currentUser = document.body.getAttribute('data-current-user'); // You'll need to add this attribute to your HTML
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+
+    // Connect to WebSocket
+    stompClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+
+        // Subscribe to user's private queue
+        stompClient.subscribe('/user/queue/messages', function(message) {
+            const newMessage = JSON.parse(message.body);
+            handleIncomingMessage(newMessage);
         });
-      });
-    }
-    wireSearch('search-desk', '#conv-desk li');
-    wireSearch('search-mob',  '#conv-mob li');
-</script>
-<!-- Auto-redirect inbox → first thread -->
-<script th:if="${firstUsername != null and selectedUsername == null}">
-    /*<![CDATA[*/
-    if (!new URLSearchParams(window.location.search).has('noRedirect')) {
-        window.location.href = /*[[ @{/messages/} ]]*/ + '[[${firstUsername}]]';
-    }
-    /*]]>*/
-</script>
-<script>
-    // BACK‐BUTTON: show the list view, hide the chat view
-    document.getElementById('back-btn').addEventListener('click', function(e) {
-      e.preventDefault();
-      document.getElementById('list-pane').classList.remove('d-none');
-      document.getElementById('chat-pane').classList.add('d-none');
+
+        // Subscribe to typing notifications
+        stompClient.subscribe('/user/queue/typing', function(typing) {
+            const typingData = JSON.parse(typing.body);
+            showTypingIndicator(typingData.sender, typingData.isTyping);
+        });
     });
+
+    // Initialize emoji pickers
+    emojiPickers.forEach(picker => {
+        picker.addEventListener('emoji-click', event => {
+            const input = picker.id.includes('mobile') ?
+                document.getElementById('mobileMessageInput') :
+                document.getElementById('messageInput');
+            input.value += event.detail.unicode;
+            input.focus();
+        });
+    });
+
+    // Toggle emoji pickers
+    emojiToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const pickerId = this.id.replace('Toggle', 'Picker');
+            const picker = document.getElementById(pickerId);
+            picker.classList.toggle('d-none');
+        });
+    });
+
+    // Handle message submission
+    messageForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const recipient = formData.get('recipient');
+            const content = formData.get('content').trim();
+
+            if (!content) return;
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    this.reset();
+                    // Hide emoji picker after sending
+                    const picker = this.querySelector('emoji-picker');
+                    if (picker) picker.classList.add('d-none');
+                } else {
+                    showAlert('Failed to send message', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error sending message', 'danger');
+            });
+        });
+    });
+
+    // Typing indicators
+    messageInputs.forEach(input => {
+        let typingTimeout;
+
+        input.addEventListener('input', function() {
+            const recipient = this.closest('form').querySelector('input[name="recipient"]').value;
+
+            // Send typing notification
+            stompClient.send("/app/typing", {}, JSON.stringify({
+                recipient: recipient,
+                isTyping: true
+            }));
+
+            // Clear previous timeout
+            clearTimeout(typingTimeout);
+
+            // Set timeout to send "stopped typing" after 2 seconds of inactivity
+            typingTimeout = setTimeout(() => {
+                stompClient.send("/app/typing", {}, JSON.stringify({
+                    recipient: recipient,
+                    isTyping: false
+                }));
+            }, 2000);
+        });
+    });
+
+    // Handle back button on mobile
+    if (backBtn) {
+        backBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = this.href;
+        });
+    }
+
+    // New message button functionality
+    newMessageButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const listId = this.id.replace('new-', 'new-list-');
+            const list = document.getElementById(listId);
+            list.classList.toggle('d-none');
+        });
+    });
+
+    // Search functionality
+    searchInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const listId = this.id.replace('search-', 'conv-');
+            const list = document.getElementById(listId);
+
+            Array.from(list.querySelectorAll('.list-group-item')).forEach(item => {
+                const name = item.querySelector('strong').textContent.toLowerCase();
+                const snippet = item.querySelector('small').textContent.toLowerCase();
+
+                if (name.includes(searchTerm) || snippet.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Message actions (delete, react)
+    document.addEventListener('click', function(e) {
+        // Delete message
+        if (e.target.closest('.delete-btn')) {
+            const btn = e.target.closest('.delete-btn');
+            const messageId = btn.getAttribute('data-messageid');
+
+            if (confirm('Are you sure you want to delete this message?')) {
+                fetch(`/messages/${messageId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        btn.closest('.message-container').remove();
+                        showAlert('Message deleted', 'success');
+                    } else {
+                        showAlert('Failed to delete message', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Error deleting message', 'danger');
+                });
+            }
+        }
+
+        // Add reaction
+        if (e.target.closest('.react-btn')) {
+            const btn = e.target.closest('.react-btn');
+            const messageId = btn.getAttribute('data-messageid');
+            const picker = document.createElement('emoji-picker');
+
+            picker.classList.add('reaction-picker');
+            btn.appendChild(picker);
+
+            picker.addEventListener('emoji-click', function(event) {
+                const emoji = event.detail.unicode;
+
+                fetch(`/messages/${messageId}/react`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    },
+                    body: `emoji=${encodeURIComponent(emoji)}`
+                })
+                .then(response => {
+                    if (response.ok) {
+                        updateReactionUI(messageId, emoji);
+                    } else {
+                        showAlert('Failed to add reaction', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('Error adding reaction', 'danger');
+                });
+
+                picker.remove();
+            });
+
+            // Close picker when clicking elsewhere
+            document.addEventListener('click', function closePicker(evt) {
+                if (!picker.contains(evt.target) && evt.target !== btn) {
+                    picker.remove();
+                    document.removeEventListener('click', closePicker);
+                }
+            });
+        }
+
+        // Remove reaction
+        if (e.target.closest('.reaction-badge')) {
+            const badge = e.target.closest('.reaction-badge');
+            const messageId = badge.getAttribute('data-messageid');
+            const emoji = badge.getAttribute('data-emoji');
+
+            fetch(`/messages/${messageId}/react`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': getCsrfToken()
+                },
+                body: `emoji=${encodeURIComponent(emoji)}`
+            })
+            .then(response => {
+                if (response.ok) {
+                    updateReactionUI(messageId, emoji, true);
+                } else {
+                    showAlert('Failed to remove reaction', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error removing reaction', 'danger');
+            });
+        }
+    });
+
+    // Mark messages as read when they become visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const messageId = entry.target.getAttribute('data-message-id');
+                if (messageId) {
+                    fetch(`/messages/${messageId}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': getCsrfToken()
+                        }
+                    });
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.message-container').forEach(container => {
+        observer.observe(container);
+    });
+
+    // Poll for new messages
+    setInterval(checkForNewMessages, 5000);
+
+    // Functions
+    function handleIncomingMessage(message) {
+        const messagesContainer = document.getElementById('messages') || document.getElementById('mob-messages');
+        const isCurrentChat = window.location.pathname.endsWith(`/messages/${message.sender.username}`);
+
+        if (isCurrentChat) {
+            // Add message to current chat
+            const messageElement = createMessageElement(message);
+            messagesContainer.appendChild(messageElement);
+            scrollToBottom();
+
+            // Mark as read
+            fetch(`/messages/${message.id}/read`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken()
+                }
+            });
+        } else {
+            // Update conversation list
+            updateConversationList(message);
+            showAlert(`New message from ${message.sender.fullName}`, 'info');
+        }
+    }
+
+    function createMessageElement(message) {
+        const isSent = message.sender.username === currentUser;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `d-flex mb-3 message-container justify-content-${isSent ? 'end' : 'start'}`;
+        messageDiv.setAttribute('data-message-id', message.id);
+
+        const msgContent = `
+            <div class="msg ${isSent ? 'sent' : 'received'}">
+                <div class="msg-actions">
+                    <button class="react-btn" data-messageid="${message.id}" aria-label="Add reaction">
+                        <i class="far fa-smile"></i>
+                    </button>
+                    <button class="delete-btn" data-messageid="${message.id}" aria-label="Delete message">
+                        <i class="far fa-trash-alt"></i>
+                    </button>
+                </div>
+                <div>${message.content}</div>
+                ${message.reactions ? createReactionsHTML(message.reactions, message.id) : ''}
+                <div class="d-flex justify-content-between align-items-end mt-1">
+                    <div class="text-start small ${isSent ? 'text-white-50' : 'text-muted'}">
+                        ${formatTime(message.sentAt)}
+                    </div>
+                    ${isSent ? createStatusIcon(message) : ''}
+                </div>
+            </div>
+        `;
+
+        messageDiv.innerHTML = msgContent;
+        messageDiv.classList.add('new-message');
+        return messageDiv;
+    }
+
+    function createReactionsHTML(reactions, messageId) {
+        let html = '<div class="reactions-container">';
+        for (const [emoji, users] of Object.entries(reactions)) {
+            if (users && users.size > 0) {
+                html += `
+                    <span class="reaction-badge" data-emoji="${emoji}" data-messageid="${messageId}">
+                        <span>${emoji}</span>
+                        <small>${users.size}</small>
+                    </span>
+                `;
+            }
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function createStatusIcon(message) {
+        if (message.read) {
+            return '<div class="msg-status"><i class="fas fa-check-double text-info" aria-label="Read"></i></div>';
+        } else if (message.delivered) {
+            return '<div class="msg-status"><i class="fas fa-check text-muted" aria-label="Delivered"></i></div>';
+        }
+        return '';
+    }
+
+    function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showTypingIndicator(sender, isTyping) {
+        const typingIndicator = document.getElementById('typingIndicator') ||
+                               document.getElementById('mobileTypingIndicator');
+        const typingText = document.getElementById('typingText') ||
+                          document.getElementById('mobileTypingText');
+
+        if (typingIndicator && typingText) {
+            if (isTyping) {
+                typingText.textContent = `${sender} is typing...`;
+                typingIndicator.style.display = 'block';
+            } else {
+                typingIndicator.style.display = 'none';
+            }
+        }
+    }
+
+    function updateConversationList(message) {
+        conversationLists.forEach(list => {
+            const existingItem = list.querySelector(`[href="/messages/${message.sender.username}"]`);
+
+            if (existingItem) {
+                // Update existing conversation
+                const snippet = message.content.length > 50 ?
+                    message.content.substring(0, 50) + '…' : message.content;
+
+                existingItem.querySelector('small').textContent = snippet;
+                existingItem.querySelector('small:last-child').textContent = formatTime(message.sentAt);
+
+                // Update unread count
+                const unreadBadge = existingItem.querySelector('.unread-badge');
+                if (unreadBadge) {
+                    const count = parseInt(unreadBadge.textContent) + 1;
+                    unreadBadge.textContent = count;
+                } else {
+                    const badge = document.createElement('span');
+                    badge.className = 'unread-badge align-self-end';
+                    badge.textContent = '1';
+                    existingItem.querySelector('.text-end').appendChild(badge);
+                }
+
+                // Move to top
+                list.insertBefore(existingItem.parentElement, list.firstChild);
+            } else {
+                // Create new conversation item
+                const li = document.createElement('li');
+                li.className = 'list-group-item unread';
+
+                const avatarUrl = message.sender.profilePictureUrl || '/images/default-avatar.png';
+                const snippet = message.content.length > 50 ?
+                    message.content.substring(0, 50) + '…' : message.content;
+
+                li.innerHTML = `
+                    <a href="/messages/${message.sender.username}"
+                       class="d-flex justify-content-between text-reset text-decoration-none"
+                       aria-label="Conversation with ${message.sender.fullName}">
+                        <div class="d-flex align-items-center">
+                            <img src="${avatarUrl}"
+                                 class="rounded-circle me-2" width="40" height="40"
+                                 alt="Profile picture of ${message.sender.fullName}">
+                            <div>
+                                <strong>${message.sender.fullName}</strong><br>
+                                <small class="text-muted">${snippet}</small>
+                            </div>
+                        </div>
+                        <div class="text-end ms-2 d-flex flex-column">
+                            <small class="text-muted">${formatTime(message.sentAt)}</small>
+                            <span class="unread-badge align-self-end">1</span>
+                        </div>
+                    </a>
+                `;
+
+                list.insertBefore(li, list.firstChild);
+            }
+        });
+    }
+
+    function checkForNewMessages() {
+        const path = window.location.pathname;
+        const match = path.match(/\/messages\/([^\/]+)/);
+
+        if (match) {
+            const otherUser = match[1];
+            const messages = document.querySelectorAll('.message-container');
+            const lastMessageId = messages.length > 0 ?
+                messages[messages.length - 1].getAttribute('data-message-id') : null;
+
+            if (lastMessageId) {
+                fetch(`/messages/${otherUser}/updates?lastId=${lastMessageId}`)
+                .then(response => response.json())
+                .then(newMessages => {
+                    if (newMessages && newMessages.length > 0) {
+                        const messagesContainer = document.getElementById('messages') ||
+                                                 document.getElementById('mob-messages');
+
+                        newMessages.forEach(msg => {
+                            const messageElement = createMessageElement(msg);
+                            messagesContainer.appendChild(messageElement);
+                        });
+
+                        scrollToBottom();
+                    }
+                })
+                .catch(error => console.error('Error checking for new messages:', error));
+            }
+        }
+    }
+
+    function updateReactionUI(messageId, emoji, isRemoval = false) {
+        const messageContainers = document.querySelectorAll(`.message-container[data-message-id="${messageId}"]`);
+
+        messageContainers.forEach(container => {
+            const msgDiv = container.querySelector('.msg');
+            let reactionsContainer = msgDiv.querySelector('.reactions-container');
+
+            if (!reactionsContainer) {
+                reactionsContainer = document.createElement('div');
+                reactionsContainer.className = 'reactions-container';
+                msgDiv.appendChild(reactionsContainer);
+            }
+
+            if (isRemoval) {
+                // Remove the reaction badge
+                const badge = reactionsContainer.querySelector(`.reaction-badge[data-emoji="${emoji}"]`);
+                if (badge) {
+                    badge.remove();
+                }
+
+                // Remove reactions container if empty
+                if (reactionsContainer.children.length === 0) {
+                    reactionsContainer.remove();
+                }
+            } else {
+                // Check if reaction already exists
+                let badge = reactionsContainer.querySelector(`.reaction-badge[data-emoji="${emoji}"]`);
+
+                if (badge) {
+                    // Increment count
+                    const countElement = badge.querySelector('small');
+                    const count = parseInt(countElement.textContent) + 1;
+                    countElement.textContent = count;
+                } else {
+                    // Create new badge
+                    badge = document.createElement('span');
+                    badge.className = 'reaction-badge';
+                    badge.setAttribute('data-emoji', emoji);
+                    badge.setAttribute('data-messageid', messageId);
+                    badge.innerHTML = `<span>${emoji}</span><small>1</small>`;
+                    reactionsContainer.appendChild(badge);
+                }
+            }
+        });
+    }
+
+    function scrollToBottom() {
+        const messagesContainer = document.getElementById('messages') || document.getElementById('mob-messages');
+        if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    }
+
+    function showAlert(message, type) {
+        alertText.textContent = message;
+        alertMessage.className = `alert alert-${type} alert-message`;
+        alertMessage.style.display = 'block';
+
+        setTimeout(() => {
+            alertMessage.style.display = 'none';
+        }, 5000);
+    }
+
+    function hideAlert() {
+        alertMessage.style.display = 'none';
+    }
+
+    function getCsrfToken() {
+        return document.querySelector('meta[name="_csrf"]').content;
+    }
+
+    // Initial scroll to bottom
+    scrollToBottom();
+});
 </script>
-<footer class="bg-light text-center text-muted py-3 mt-auto shadow-sm" style="position: fixed; bottom: 0; width: 100%;">
-    <div>
-        © 2025 Social Media Platform. All rights reserved.
-    </div>
-</footer>
+<!-- Add these scripts before your custom JS -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.js"></script>
+
+<!-- Your custom JS -->
+<script src="/js/messages.js"></script>
 
 </body>
 </html>

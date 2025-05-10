@@ -69,11 +69,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         mappedAttrs.put("db_user_id", user.getId());
         mappedAttrs.put("db_username", user.getUsername());
 
-        // Return Spring Security user
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(user.getRole())),
+        return new CustomOAuth2User(
+                user,
                 mappedAttrs,
-                "email"
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole()))
         );
+
     }
 }

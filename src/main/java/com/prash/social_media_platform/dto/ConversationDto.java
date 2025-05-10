@@ -10,6 +10,9 @@ public class ConversationDto {
     private final String lastMessageSnippet;
     private long   unreadCount;
     private boolean read;
+    private String profilePictureUrl;
+
+
 
     public ConversationDto(String username,
                            String displayName,
@@ -27,6 +30,13 @@ public class ConversationDto {
         this.read              = read;
     }
 
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
 
     public boolean isRead() {
         return read;

@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ public class Message {
     private String content;
 
     @CreationTimestamp
+    @Column(name = "sent_at")
     private Instant sentAt;
 
     @Column(name = "is_read", nullable = false)
@@ -43,10 +45,12 @@ public class Message {
     @Column(name = "delivered_at")
     private Date deliveredAt;
 
-    @Transient
-    private boolean deletedBySender;
-    @Transient
-    private boolean deletedByRecipient;
+    @Column(name = "deleted_by_sender", nullable = false)
+    private Boolean deletedBySender = false;
+
+    @Column(name = "deleted_by_recipient", nullable = false)
+    private Boolean deletedByRecipient = false;
+
 
     @ElementCollection
     @CollectionTable(name = "message_reactions",
@@ -55,12 +59,39 @@ public class Message {
     @Column(name = "user_id")
     private Map<String, Set<String>> reactions;
 
+    @Column(nullable = false)
+    private boolean delivered = false;
+
+    public Boolean getDeletedBySender() {
+        return deletedBySender;
+    }
+
+    public void setDeletedBySender(Boolean deletedBySender) {
+        this.deletedBySender = deletedBySender;
+    }
+
+    public Boolean getDeletedByRecipient() {
+        return deletedByRecipient;
+    }
+
+    public void setDeletedByRecipient(Boolean deletedByRecipient) {
+        this.deletedByRecipient = deletedByRecipient;
+    }
+
+    public boolean isDelivered() {
+        return delivered;
+    }
+
     public Map<String, Set<String>> getReactions() {
         return reactions;
     }
 
     public void setReactions(Map<String, Set<String>> reactions) {
-        this.reactions = reactions;
+        this.reactions = reactions != null ? reactions : new HashMap<>();
+    }
+    // Helper method
+    public boolean hasReactions() {
+        return reactions != null && !reactions.isEmpty();
     }
 
 
@@ -166,5 +197,9 @@ public class Message {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public void setDelivered(boolean b) {
+        this.deliveredAt = b ? new Date() : null;
     }
 }
