@@ -320,7 +320,7 @@
 <!-- Alert Messages -->
 <div id="alertMessage" class="alert alert-danger alert-message" role="alert">
     <span id="alertText"></span>
-    <button type="button" class="btn-close" onclick="hideAlert()"></button>
+    <button type="button" class="btn-close" onclick="hideAlert()" aria-label="Close alert"></button>
 </div>
 
 <div class="container-fluid messages-container p-0">
@@ -573,7 +573,7 @@
                             <button type="button" class="btn btn-link text-primary" id="mobileEmojiToggle" aria-label="Emoji picker">
                                 <i class="far fa-smile"></i>
                             </button>
-                            <button type="submit" class="btn btn-link text-primary" aria-label="Send message">
+                            <button type="submit" class="btn btn-link text-primary" aria-label="Send message" onclick="pageReload()">
                                 <i class="far fa-paper-plane"></i>
                             </button>
                         </div>
@@ -649,40 +649,46 @@
         });
     });
 
-    // Handle message submission
-    messageForms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const recipient = formData.get('recipient');
-            const content = formData.get('content').trim();
+   messageForms.forEach(form => {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-            if (!content) return;
+        const formData = new FormData(this);
+        const recipient = formData.get('recipient');
+        const content = formData.get('content').trim();
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 
-            fetch(this.action, {
+        if (!content) return;
+
+        try {
+            const response = await fetch(this.action, {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                    'X-CSRF-TOKEN': csrfToken
                 }
-            })
-            .then(response => {
-                if (response.ok) {
-                    this.reset();
-                    // Hide emoji picker after sending
-                    const picker = this.querySelector('emoji-picker');
-                    if (picker) picker.classList.add('d-none');
-                } else {
-                    showAlert('Failed to send message', 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('Error sending message', 'danger');
             });
-        });
+
+            if (response.ok) {
+                this.reset();
+
+                // Hide emoji picker after sending
+                const picker = this.querySelector('emoji-picker');
+                if (picker) picker.classList.add('d-none');
+
+                // Optionally reload or append message dynamically instead of reload
+                location.reload();  // Only reload if necessary
+            } else {
+                showAlert('Failed to send message', 'danger');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('Error sending message', 'danger');
+        }
     });
+});
+
 
     // Typing indicators
     messageInputs.forEach(input => {
