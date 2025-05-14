@@ -53,17 +53,13 @@ public class MessageController {
         List<User> allUsers = userService.findAllExcept(me);
         long unreadNotifications = notificationService.unreadCount(me);
 
-        if (!conversations.isEmpty()) {
-            String firstUsername = conversations.get(0).getUsername();
-            return "redirect:/messages/" + firstUsername;
-        }
-
-        model.addAttribute("conversations", conversations);
-        model.addAttribute("allUsers", allUsers);
-        model.addAttribute("unreadNotifications", unreadNotifications);
-        model.addAttribute("firstUsername", null);
+        model.addAttribute("selectedUsername", null);
+        model.addAttribute("firstUsername", !conversations.isEmpty() ? conversations.get(0).getUsername() : null);
         model.addAttribute("messages", Collections.emptyList());
         model.addAttribute("otherUser", null);
+        model.addAttribute("conversations", conversations);
+        model.addAttribute("allUsers", userService.findAllExcept(me));
+        model.addAttribute("unreadNotifications", unreadNotifications);
 
         return "message";
     }

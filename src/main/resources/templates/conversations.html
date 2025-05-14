@@ -53,6 +53,8 @@
           border-radius: 50%; width: 1.5rem; height: 1.5rem;
           font-size: .75rem; line-height: 1.5rem;
         }
+        .z-1 { z-index: 1; }
+        .z-2 { z-index: 2; }
     </style>
 </head>
 <body>
@@ -103,12 +105,15 @@
         </section>
 
         <!-- MOBILE: Full-screen Conversation List -->
-        <div class="d-flex d-md-none flex-column vh-100 p-0">
-            <div class="search-bar">
+        <div class="d-flex d-md-none flex-column vh-100 p-0 position-relative sidebar">
+            <div class="search-bar z-1">
                 <input id="search-mob" type="text" class="form-control" placeholder="Search…">
                 <button id="new-mob" class="btn btn-primary"><i class="fas fa-plus"></i></button>
             </div>
-            <div id="new-list-mob" class="list-group d-none">
+
+            <div id="new-list-mob"
+                 class="list-group position-absolute top-0 start-0 end-0 bg-white overflow-auto z-2 d-none"
+                 style="max-height: calc(100% - 56px); margin-top: 56px;">
                 <a th:each="u : ${allUsers}"
                    th:href="@{'/messages/' + ${u.username}}"
                    class="list-group-item list-group-item-action"
@@ -136,7 +141,6 @@
                 </li>
             </ul>
         </div>
-
     </div>
 </div>
 
@@ -145,9 +149,20 @@
 <script>
     // Toggle “new conversation” lists
     document.getElementById('new-desk').onclick = () =>
-      document.getElementById('new-list-desk').classList.toggle('d-none');
+    document.getElementById('new-list-desk').classList.toggle('d-none');
     document.getElementById('new-mob').onclick = () =>
-      document.getElementById('new-list-mob').classList.toggle('d-none');
+    document.getElementById('new-list-mob').classList.toggle('d-none');
+
+    // Auto-hide #new-list-mob when a user is selected
+    document.addEventListener('click', function (e) {
+        const newList = document.getElementById('new-list-mob');
+
+        // If a link inside #new-list-mob is clicked
+        if (newList && newList.contains(e.target) && e.target.tagName === 'A') {
+            newList.classList.add('d-none');
+        }
+    });
+
 
     // Live search filtering
     function wireSearch(inputId, itemSelector) {
