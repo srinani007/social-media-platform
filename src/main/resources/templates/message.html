@@ -457,22 +457,25 @@
         </section>
 
         <!-- MOBILE LAYOUT -->
-        <div class="d-flex d-md-none flex-column mobile-pane h-100">
+        <div class="d-flex d-md-none flex-column mobile-pane h-100 position-relative">
+
+            <!-- NEW MESSAGE LIST (Overlay) -->
+            <div id="new-list-mob"
+                 class="list-group position-absolute top-0 start-0 end-0 bg-white z-3 d-none"
+                 style="margin-top: 56px; max-height: calc(100% - 56px); overflow-y: auto;">
+                <a th:each="u : ${allUsers}"
+                   th:href="@{'/messages/' + ${u.username}}"
+                   class="list-group-item list-group-item-action text-dark"
+                   th:unless="${u.username == #authentication.name}"
+                   th:text="${u.fullName != null ? u.fullName : u.username}">User</a>
+            </div>
+
             <!-- LIST VIEW - Default view on mobile -->
             <div id="list-pane" class="flex-grow-1 d-flex flex-column"
                  th:classappend="${selectedUsername != null} ? ' d-none' : ''">
                 <div class="search-bar">
                     <input id="search-mob" type="text" class="form-control" placeholder="Search messages..." aria-label="Search messages">
                     <button id="new-mob" class="btn btn-outline-primary" aria-label="New message"><i class="fas fa-pen-to-square"></i></button>
-                </div>
-                <div id="new-list-mob" class="list-group overflow-auto"
-                     th:classappend="${selectedUsername != null} ? ' d-none' : ''">
-                    <a th:each="u : ${allUsers}"
-                       th:href="@{'/messages/' + ${u.username}}"
-                       class="list-group-item list-group-item-action text-dark"
-                       th:unless="${u.username == #authentication.name}"
-                       th:text="${u.fullName != null ? u.fullName : u.username}"
-                       aria-label="Start chat with ${u.fullName}">Name</a>
                 </div>
             </div>
             <div class="conversation-list">
@@ -687,7 +690,6 @@
         }
     });
 });
-
 
     // Typing indicators
     messageInputs.forEach(input => {
