@@ -44,7 +44,7 @@
             </button>
 
             <!-- Collapsible content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse text-center" id="navbarNav">
                 <!-- Left-side links -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item" th:if="${!#authorization.expression('isAuthenticated()')}">
@@ -80,26 +80,31 @@
                         <span class="badge bg-danger position-absolute badge-unread" th:if="${unreadCount > 0}" th:text="${unreadCount}"></span>
                     </a>
 
+
                     <!-- Notifications -->
-                    <div class="dropdown me-3" th:if="${#authorization.expression('isAuthenticated()')}">
-                        <button class="btn btn-sm btn-outline-light position-relative" id="notificationDropdown"
+                    <div class="tp-yt-iron-dropdown me-3 justify-content-between align-items-center " th:if="${#authorization.expression('isAuthenticated()')}">
+                        <button class="btn btn-sm btn-outline-light position-relative text-center" id="notificationDropdown"
                                 data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-bell"></i>
                             <span class="badge bg-danger position-absolute badge-unread" th:if="${notificationCount > 0}"
                                   id="notificationBadge" th:text="${notificationCount}"></span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end notif-dropdown-menu" aria-labelledby="notificationDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end notif-dropdown-menu p-0 text-center" aria-labelledby="notificationDropdown" style="max-width: 95vw; max-height: 70vh; overflow-y: auto;">
                             <li class="no-notifs" th:if="${#lists.isEmpty(notifications)}">
-                                <span class="dropdown-item-text">No notifications</span>
+                                <span class="dropdown-item-text text-center">No notifications</span>
                             </li>
-                            <li th:each="n : ${notifications}" class="notif-item">
-                                <a class="dropdown-item d-flex justify-content-between notif-link"
+                            <li th:each="n : ${notifications}" class="notif-item border-bottom">
+                                <a class="dropdown-item d-flex justify-content-between align-items-center notif-link py-2 px-3"
                                    th:data-id="${n.id}"
                                    th:href="@{${n.link}}">
-                                    <span th:text="${n.title}">Title</span>
-                                    <small class="text-muted" th:text="${#temporals.format(n.timestamp,'HH:mm')}">time</small>
+                                    <div class="d-flex flex-column w-100 text-center">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fw-semibold text-truncate pe-2" th:text="${n.title}" style="max-width: 70%;">Title</span>
+                                            <small class="text-muted text-nowrap" th:text="${#temporals.format(n.timestamp,'HH:mm')}">time</small>
+                                        </div>
+                                        <div class="small text-muted text-truncate pt-1" th:text="${n.message}" style="max-width: 100%;">Message…</div>
+                                    </div>
                                 </a>
-                                <div class="dropdown-item-text small ps-3" th:text="${n.message}">Message…</div>
                             </li>
                         </ul>
                     </div>

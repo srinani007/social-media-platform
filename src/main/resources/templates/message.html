@@ -478,7 +478,7 @@
                     <button id="new-mob" class="btn btn-outline-primary" aria-label="New message"><i class="fas fa-pen-to-square"></i></button>
                 </div>
             </div>
-            <div class="conversation-list">
+            <div th:if="${selectedUsername == null}" class="conversation-list">
                 <ul id="conv-mob" class="list-group">
                     <li th:each="conv : ${conversations}"
                         class="list-group-item"
