@@ -60,7 +60,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -70,9 +69,6 @@
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
 		</dependency>
-
-
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
@@ -86,12 +82,10 @@
 			<artifactId>dotenv-java</artifactId>
 			<version>3.0.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>

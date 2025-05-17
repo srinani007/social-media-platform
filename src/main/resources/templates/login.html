@@ -15,15 +15,6 @@
           crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
-        :root {
-            --gradient-start: #1e3c72;
-            --gradient-end: #2a5298;
-            --card-background: rgba(255, 255, 255, 0.95);
-            --glass-blur: 12px;
-            --glass-border: 1px solid rgba(255, 255, 255, 0.25);
-            --primary-glow: rgba(65, 120, 255, 0.4);
-            --text-glow: rgba(255, 255, 255, 0.8);
-        }
 
         @media (prefers-color-scheme: dark) {
             :root {
@@ -38,6 +29,7 @@
         }
         body {
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            animation: gradientShift 15s ease infinite;
             background-size: 200% 200%;
             font-family: 'Segoe UI', system-ui, sans-serif;
             color: #f8f9fa;
@@ -47,7 +39,25 @@
             --bubble-color: rgba(255, 255, 255, 0.05);
             padding-bottom: 100px; /* Added for footer space */
         }
-
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, var(--bubble-color) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, var(--bubble-color) 0%, transparent 20%);
+            pointer-events: none;
+            z-index: -1;
+            animation: particleMove 20s linear infinite;
+        }
+        * {
+            transition: background-color 0.3s ease, 
+                        border-color 0.3s ease,
+                        box-shadow 0.3s ease;
+        }
 
         main {
             display: flex;
@@ -55,34 +65,61 @@
             align-items: center;
             min-height: calc(100vh - 80px);
         }
+
+        .footer-fixed {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
         .auth-card {
-            background: var(--card-background);
+            --glass-blur: 16px;
+            background: rgba(36, 121, 211, 0.861) !important;
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border: var(--glass-border);
             border-radius: 1.5rem;
             padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
-                        0 0 20px var(--primary-glow);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+                0 0 30px var(--primary-glow),
+                inset 0 0 10px rgba(255, 255, 255, 0.1);
             width: 90%; max-width: 400px;
             height: auto;
             margin: 2rem auto;
             position: relative;
         }
         .auth-card::before, .auth-card::after {
-            content: '';
             position: absolute;
             width: 100%; height: 2px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+                background: linear-gradient(90deg, 
+                rgba(255,255,255,0.1), 
+                rgba(255,255,255,0.3), 
+                rgba(255,255,255,0.1));
+            animation: gradientFlow 3s ease infinite;
+            z-index: 0;
+            height: 1px;
         }
         .auth-card::before { top: 0; left: 0; border-radius: 1rem 1rem 0 0; }
         .auth-card::after  { bottom: 0; left: 0; }
 
-        .form-control:focus {
-            border-color: var(--gradient-start);
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.25);
-            background: #fff;
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
         }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
         .btn-login {
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             border: none;
@@ -91,6 +128,10 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px var(--primary-glow);
             color: #fff;
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+            z-index: 1;
             transition: all 0.4s ease;
         }
         .btn-login:hover {
@@ -112,11 +153,6 @@
             transition: 0.5s;
             z-index: -1;
         }
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px var(--primary-glow);
-        }
-
         /* Animations */
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
@@ -190,18 +226,8 @@
 </head>
 <body>
 
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-      toastElList.map(function (toastEl) {
-        return new bootstrap.Toast(toastEl).show();
-      });
-    });
-</script>
-
 <!-- Navbar -->
 <div th:replace="~{fragments/navbar :: navbar}"></div>
-
 
 <!-- Main Content -->
 
@@ -289,5 +315,14 @@
         </div>
     </div>
 </div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+      toastElList.map(function (toastEl) {
+        return new bootstrap.Toast(toastEl).show();
+      });
+    });
+</script>
 </body>
 </html>
