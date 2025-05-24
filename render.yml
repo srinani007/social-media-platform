@@ -7,9 +7,9 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: JDBC_DATABASE_URL
-        value: jdbc:postgresql://ep-super-truth-a4kbslw6-pooler.us-east-1.aws.neon.tech/socialmedia?sslmode=require
+        value: jdbc:postgresql://dpg-d0onkbje5dus73d24r20-a/db_social_kmuf?sslmode=require
       - key: JDBC_DATABASE_USERNAME
-        value: neondb_owner
+        value: db_social_kmuf_user
       - key: JDBC_DATABASE_PASSWORD
         value: npg_xWFiyCMO6nj7
       - key: PAYPAL_CLIENT_ID
