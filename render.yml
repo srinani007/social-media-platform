@@ -7,7 +7,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: JDBC_DATABASE_URL
-        value: jdbc:postgresql://dpg-d0onkbje5dus73d24r20-a/db_social_kmuf?sslmode=require
+        value: jdbc:postgresql://dpg-d0onkbje5dus73d24r20-a.oregon-postgres.render.com/db_social_kmuf?sslmode=require
       - key: JDBC_DATABASE_USERNAME
         value: db_social_kmuf_user
       - key: JDBC_DATABASE_PASSWORD
