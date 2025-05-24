@@ -11,7 +11,7 @@ services:
       - key: JDBC_DATABASE_USERNAME
         value: db_social_kmuf_user
       - key: JDBC_DATABASE_PASSWORD
-        value: npg_xWFiyCMO6nj7
+        value: 0huF5cfYgtEM038fqfj1hCxcvlcvhW8p
       - key: PAYPAL_CLIENT_ID
         sync: false
       - key: PAYPAL_CLIENT_SECRET
